@@ -4,7 +4,8 @@
   "description": "Universal hyperHTML",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "istanbul cover test/test.js",
+    "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
@@ -29,5 +30,10 @@
   "dependencies": {
     "html-escaper": "^1.0.0",
     "hyperhtml": "^0.7.0"
+  },
+  "devDependencies": {
+    "coveralls": "^2.12.0",
+    "istanbul": "^0.4.5",
+    "tressa": "^0.3.1"
   }
 }

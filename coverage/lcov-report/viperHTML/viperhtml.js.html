@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for viperHTML/viperhtml.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">viperHTML/</a> viperhtml.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">83.33% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>30/36</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">62.5% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>15/24</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">72.73% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>8/11</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">82.86% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>29/35</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+/*! (C) 2017 Andrea Giammarchi @WebReflection (MIT) */
+&nbsp;
+// viperHTML \o/
+//
+// var render = viperHTML.bind(object);
+// render`
+//  &lt;h1&gt;⚡️ viperHTML ⚡️&lt;/h1&gt;
+//  &lt;p&gt;
+//    ${(new Date).toLocaleString()}
+//  &lt;/p&gt;
+// `;
+function viperHTML(statics) {
+  var viper = wm.get(this);
+  return viper &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >viper.s === statics </span>?
+<span class="branch-0 cbranch-no" title="branch not covered" >    update.apply(viper, arguments) </span>:
+    upgrade.apply(this, arguments);
+}
+&nbsp;
+// A wire ➰ is a shortcut to relate a specific object,
+// or a runtime created one, to a specific template.
+//
+// var render = viperHTML.wire();
+// render`
+//  &lt;div&gt;Hello Wired!&lt;/div&gt;
+// `;
+viperHTML.wire = <span class="fstat-no" title="function not covered" >function wire(object) {</span>
+<span class="cstat-no" title="statement not covered" >  return viperHTML.bind(arguments.length &lt; 1 ? {} : object);</span>
+};
+&nbsp;
+// - - - - - - - - - - - - - - - - - -  - - - - -
+&nbsp;
+// -------------------------
+// DOM investigation
+// -------------------------
+&nbsp;
+// if a gap is in between a node declaration
+// and its attribute definition this is true
+function isAttribute(statics, i) {
+  var
+    before = slice.call(statics, 0, i).join(''),
+    after = slice.call(statics, i).join('')
+  ;
+  return ATTRIBUTE_BEFORE.test(before) &amp;&amp; ATTRIBUTE_AFTER.test(after);
+}
+&nbsp;
+// if a gap is in between html elements
+// allow any sort of HTML content
+function isHTML(statics, i) {
+  var
+    before = i &lt; 1 ? <span class="branch-0 cbranch-no" title="branch not covered" >'' </span>: statics[i - 1],
+    after = statics[i]
+  ;
+  return before.slice(-1) === '&gt;' &amp;&amp; after[0] === '&lt;';
+}
+&nbsp;
+// -------------------------
+// Helpers
+// -------------------------
+&nbsp;
+// if a node is an attribute, return the right function
+// accordingly if that's an escape or a callback
+function getUpdateForAttribute(copies, i) {
+  var name = copies[i - 1].replace(ATTRIBUTE_NAME, '$1');
+  return SPECIAL_ATTRIBUTE.test(name) ?
+    (ATTRIBUTE_EVENT.test(name) ?
+      updateEvent(name) :
+<span class="branch-1 cbranch-no" title="branch not covered" >      updateBoolean(name, copies, i))</span> :
+    escape;
+}
+&nbsp;
+// return the right callback to update a boolean attribute
+// after modifying the template to ignore such attribute if falsy
+<span class="fstat-no" title="function not covered" >function updateBoolean(name, copies, i) {</span>
+<span class="cstat-no" title="statement not covered" >  copies[i - 1] = copies[i - 1].slice(0, -(name.length + 3));</span>
+<span class="cstat-no" title="statement not covered" >  copies[i] = copies[i].slice(1);</span>
+<span class="cstat-no" title="statement not covered" >  name = ' ' + name;</span>
+<span class="cstat-no" title="statement not covered" >  return <span class="fstat-no" title="function not covered" >function (value) {</span></span>
+<span class="cstat-no" title="statement not covered" >    return value ? name : '';</span>
+  };
+}
+&nbsp;
+&nbsp;
+// return the right callback to invoke an event
+// stringigying the callback and invoking it
+// to simulate a proper DOM behavior
+function updateEvent(name) {
+  return function (value) {
+    var inline = JS_SHORTCUT.test(value) ?
+      ('function ' + value) :
+      (<span class="branch-1 cbranch-no" title="branch not covered" >'' + value)</span>;
+    return 'return (' + escape(inline) + ').call(this, event)';
+  };
+}
+&nbsp;
+// -------------------------
+// Template setup
+// -------------------------
+&nbsp;
+// each known hyperHTML update is
+// kept as simple as possible.
+function update() {
+  for (var
+    c = this.c,
+    u = this.u,
+    out = [c[0]],
+    i = 1,
+    length = arguments.length;
+    i &lt; length; i++
+  ) {
+    out[i] = u[i - 1](arguments[i]) + c[i];
+  }
+  return out.join('');
+}
+&nbsp;
+// but the first time, it needs to be setup.
+// From now on, only update(statics) will be called
+// unless this context won't be used for other renderings.
+function upgrade(statics) {
+  for (var
+    updates = [],
+    copies = slice.call(statics),
+    viper = {s: statics, u: updates, c: copies},
+    i = 1,
+    length = statics.length;
+    i &lt; length; i++
+  ) {
+    updates[i - 1] = isHTML(statics, i) ?
+      String :
+      (isAttribute(statics, i) ?
+        getUpdateForAttribute(copies, i) :
+        escape);
+  }
+  wm.set(this, viper);
+  return update.apply(viper, arguments);
+}
+&nbsp;
+// -------------------------
+// local variables
+// -------------------------
+&nbsp;
+var
+  ATTRIBUTE_BEFORE = /&lt;[a-z]\S*[^\S]+(?:[a-z-]+(?:=(?:["'][^"']*?["']|[^"'\s]+))?[^\S]+)*?[a-z-]+="$/i,
+  ATTRIBUTE_AFTER = /^"(?:[^\S]+[a-z-]+(?:=(?:["'][^"']*?["']|[^"'\s]+))?)*?[^\S]*&gt;/i,
+  ATTRIBUTE_NAME = /^[\s\S]*?([a-z-]+)="$/i,
+  ATTRIBUTE_EVENT = /^on[a-z]+$/,
+  JS_SHORTCUT = /^[a-z$_]\S*?\(/,
+  SPECIAL_ATTRIBUTE = /^(?:on[a-z]+|async|autofocus|autoplay|capture|checked|controls|deferred|disabled|formnovalidate|loop|multiple|muted|required)$/,
+  // escape = require('html-escaper').escape,
+  escape = String,
+  wm = new WeakMap(),
+  slice = [].slice
+;
+&nbsp;
+// umd.KISS
+try { module.exports = viperHTML; } catch(o_O) {}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Mar 08 2017 23:45:36 GMT+0000 (GMT)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

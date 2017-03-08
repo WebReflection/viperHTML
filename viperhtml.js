@@ -155,22 +155,3 @@ var
 
 // umd.KISS
 try { module.exports = viperHTML; } catch(o_O) {}
-
-/*
-var a = {
-  text: 'Click Me',
-  html: '<strong>muhahahaha</strong>',
-  href: 'https://github.com/WebReflection/viperHTML',
-  onclick (e) {
-    debugger;
-  }
-};
-var link = viperHTML.bind(a);
-var rendered = link`
-  <a href="${a.href}" onclick="${a.onclick}">
-    ${a.text}
-    <span>${a.html}</span>
-  </a>
-`;
-document.body.innerHTML = rendered;
-*/

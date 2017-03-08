@@ -1,0 +1,33 @@
+{
+  "name": "viperhtml",
+  "version": "0.0.0",
+  "description": "Universal hyperHTML",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebReflection/viperHTML.git"
+  },
+  "keywords": [
+    "hyperHTML",
+    "server",
+    "render",
+    "performance",
+    "virtual",
+    "dom",
+    "alternative",
+    "universal"
+  ],
+  "author": "Andrea Giammarchi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WebReflection/viperHTML/issues"
+  },
+  "homepage": "https://github.com/WebReflection/viperHTML#readme",
+  "dependencies": {
+    "html-escaper": "^1.0.0",
+    "hyperhtml": "^0.7.0"
+  }
+}

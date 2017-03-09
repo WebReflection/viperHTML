@@ -12,7 +12,7 @@
 //  </p>
 // `;
 function viperHTML(statics) {
-  var viper = wm.get(this);
+  var viper = vipers.get(this);
   return viper && viper.s === statics ?
     update.apply(viper, arguments) :
     upgrade.apply(this, arguments);
@@ -26,7 +26,12 @@ function viperHTML(statics) {
 //  <div>Hello Wired!</div>
 // `;
 viperHTML.wire = function wire(object) {
-  return viperHTML.bind(arguments.length < 1 ? {} : object);
+  return arguments.length < 1 ?
+    viperHTML.bind({}) :
+    (wires.get(object) || (
+      wires.set(object, wire()),
+      wire(object)
+    ));
 };
 
 // - - - - - - - - - - - - - - - - - -  - - - - -
@@ -87,7 +92,7 @@ function updateBoolean(name, copies, i) {
 // to simulate a proper DOM behavior
 function updateEvent(name) {
   return function (value) {
-    var inline = JS_SHORTCUT.test(value) ?
+    var inline = JS_SHORTCUT.test(value) && !JS_FUNCTION.test(value) ?
       ('function ' + value) :
       ('' + value);
     return 'return (' + escape(inline) + ').call(this, event)';
@@ -132,7 +137,7 @@ function upgrade(statics) {
         getUpdateForAttribute(copies, i) :
         escape);
   }
-  wm.set(this, viper);
+  vipers.set(this, viper);
   return update.apply(viper, arguments);
 }
 
@@ -146,10 +151,11 @@ var
   ATTRIBUTE_NAME = /^[\s\S]*?([a-z-]+)="$/i,
   ATTRIBUTE_EVENT = /^on[a-z]+$/,
   JS_SHORTCUT = /^[a-z$_]\S*?\(/,
+  JS_FUNCTION = /^function\S*?\(/,
   SPECIAL_ATTRIBUTE = /^(?:on[a-z]+|async|autofocus|autoplay|capture|checked|controls|deferred|disabled|formnovalidate|loop|multiple|muted|required)$/,
-  // escape = require('html-escaper').escape,
-  escape = String,
-  wm = new WeakMap(),
+  escape = require('html-escaper').escape,
+  vipers = new WeakMap(),
+  wires = new WeakMap(),
   slice = [].slice
 ;
 

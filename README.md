@@ -1,1 +1,1 @@
-# viperHTML
+# viperHTML [![Build Status](https://travis-ci.org/WebReflection/hyperHTML.svg?branch=master)](https://travis-ci.org/WebReflection/viperHTML) [![Coverage Status](https://coveralls.io/repos/github/WebReflection/viperHTML/badge.svg?branch=master)](https://coveralls.io/github/WebReflection/viperHTML?branch=master)

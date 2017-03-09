@@ -42,22 +42,16 @@ viperHTML.wire = function wire(object) {
 
 // if a gap is in between a node declaration
 // and its attribute definition this is true
-function isAttribute(statics, i) {
-  var
-    before = slice.call(statics, 0, i).join(''),
-    after = slice.call(statics, i).join('')
-  ;
-  return ATTRIBUTE_BEFORE.test(before) && ATTRIBUTE_AFTER.test(after);
+function isAttribute(copies, i) {
+  return ATTRIBUTE_BEFORE.test(copies.slice(0, i).join('')) &&
+         ATTRIBUTE_AFTER.test(copies.slice(i).join(''));
 }
 
 // if a gap is in between html elements
 // allow any sort of HTML content
 function isHTML(statics, i) {
-  var
-    before = i < 1 ? '' : statics[i - 1],
-    after = statics[i]
-  ;
-  return before.slice(-1) === '>' && after[0] === '<';
+  return statics[i - 1].slice(-1) === '>' &&
+         statics[i][0] === '<';
 }
 
 // -------------------------
@@ -125,7 +119,7 @@ function update() {
 function upgrade(statics) {
   for (var
     updates = [],
-    copies = slice.call(statics),
+    copies = updates.slice.call(statics),
     viper = {s: statics, u: updates, c: copies},
     i = 1,
     length = statics.length;
@@ -133,7 +127,7 @@ function upgrade(statics) {
   ) {
     updates[i - 1] = isHTML(statics, i) ?
       String :
-      (isAttribute(statics, i) ?
+      (isAttribute(copies, i) ?
         getUpdateForAttribute(copies, i) :
         escape);
   }
@@ -146,18 +140,19 @@ function upgrade(statics) {
 // -------------------------
 
 var
-  ATTRIBUTE_BEFORE = /<[a-z]\S*[^\S]+(?:[a-z-]+(?:=(?:["'][^"']*?["']|[^"'\s]+))?[^\S]+)*?[a-z-]+="$/i,
-  ATTRIBUTE_AFTER = /^"(?:[^\S]+[a-z-]+(?:=(?:["'][^"']*?["']|[^"'\s]+))?)*?[^\S]*>/i,
+  ATTRIBUTE_BEFORE = /<[a-z]\S*[^\S]+(?:[a-z-]+(?:=(?:(["'])[^\1]*?\1|[^"'\s]+))?[^\S]+)*?[a-z-]+=["']$/i,
+  ATTRIBUTE_AFTER = /^"(?:[^\S]+[a-z-]+(?:=(?:(["'])[^\1]*?\1|[^"'\s]+))?)*?[^\S]*>/i,
   ATTRIBUTE_NAME = /^[\s\S]*?([a-z-]+)="$/i,
   ATTRIBUTE_EVENT = /^on[a-z]+$/,
   JS_SHORTCUT = /^[a-z$_]\S*?\(/,
   JS_FUNCTION = /^function\S*?\(/,
-  SPECIAL_ATTRIBUTE = /^(?:on[a-z]+|async|autofocus|autoplay|capture|checked|controls|deferred|disabled|formnovalidate|loop|multiple|muted|required)$/,
+  SPECIAL_ATTRIBUTE = require('hyperhtml').SPECIAL_ATTRIBUTE,
   escape = require('html-escaper').escape,
   vipers = new WeakMap(),
-  wires = new WeakMap(),
-  slice = [].slice
+  wires = new WeakMap()
 ;
 
-// umd.KISS
-try { module.exports = viperHTML; } catch(o_O) {}
+// just to mimic hyperHTML public statics
+viperHTML.SPECIAL_ATTRIBUTE = SPECIAL_ATTRIBUTE;
+
+module.exports = viperHTML;

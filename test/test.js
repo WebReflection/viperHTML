@@ -113,3 +113,75 @@ tressa.async(done => {
   );
   done();
 });
+
+
+tressa.async(done => {
+  var rendered = viperHTML.wire()`
+  <a
+    href="${'viper.com'}"
+    onclick="${e => e.preventDefault()}"
+  >Click Me</a>
+  `;
+  tressa.assert(
+    `
+  <a
+    href="viper.com"
+    onclick="return (e =&gt; e.preventDefault()).call(this, event)"
+  >Click Me</a>
+  ` === rendered,
+    'multiline attributes'
+  );
+  done();
+});
+
+tressa.async(done => {
+
+  tressa.log('');
+  tressa.log('## basic benchmark');
+
+  var output = render => render`
+    <a href="${a.href}" onclick="${a.onclick}">
+      ${a.text}
+      <span>${a.html}</span>${
+        '<br>'
+    }</a>
+  `;
+
+  var a = {
+    text: 'Click "Me"',
+    html: '<strong>"Risky" Me</strong>',
+    href: '/viperHTML',
+    onclick: (e) => e.preventDefault()
+  };
+
+  var link = viperHTML.bind(a);
+  var out = '';
+
+  var benchName = 'first call: upgrade + update';
+  console.time(benchName);
+  out = output(link);
+  console.timeEnd(benchName);
+
+  benchName = 'second call: cached update';
+  console.time(benchName);
+  out = output(link);
+  console.timeEnd(benchName);
+
+  benchName = 'a thousand of cached update calls';
+  console.time(benchName);
+  for (var i = 0; i < 1000; i++) {
+    out = output(link);
+  }
+  console.timeEnd(benchName);
+
+  benchName = 'a thousand of uncached upgrade + update calls';
+  console.time(benchName);
+  for (var i = 0; i < 1000; i++) {
+    out = output(viperHTML.wire());
+  }
+  console.timeEnd(benchName);
+
+  done();
+});
+
+

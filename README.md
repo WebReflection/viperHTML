@@ -5,7 +5,7 @@
 
 ### Same API without DOM constrains
 On browsers, `viperHTML` is simply a reference to [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e#.bgosolrh0),
-which uses template strings to parse just in time, and only once, a template DOM three, achieving best possible performance updating only what's needed and never the rest.
+which uses template strings to parse just in time, and only once, a template DOM tree, achieving best possible performance updating only what's needed and never the rest.
 
 On server, and _document-less_ environments, `viperHTML` parses the template string once, decides what is an attribute, what is a callback, what is text and what is HTML, and any future call to the same render will only update parts of that string.
 

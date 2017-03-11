@@ -139,6 +139,13 @@ function upgrade(statics) {
 // local variables
 // -------------------------
 
+// hyperHTML might have document in the wild to feature detect IE
+// viperHTML should not suffer browser feature detection
+// this file is used only if no document is available
+// so let's make it temporarily a thing
+
+global.document = {};
+
 var
   ATTRIBUTE_BEFORE = /<[a-z]\S*[^\S]+(?:[a-z-]+(?:=(?:(["'])[^\1]*?\1|[^"'\s]+))?[^\S]+)*?[a-z-]+=["']$/i,
   ATTRIBUTE_AFTER = /^"(?:[^\S]+[a-z-]+(?:=(?:(["'])[^\1]*?\1|[^"'\s]+))?)*?[^\S]*>/i,
@@ -151,6 +158,9 @@ var
   vipers = new WeakMap(),
   wires = new WeakMap()
 ;
+
+// let's cleanup this property now
+delete global.document;
 
 // just to mimic hyperHTML public statics
 viperHTML.SPECIAL_ATTRIBUTE = SPECIAL_ATTRIBUTE;

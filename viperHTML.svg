@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   height="636"
+   width="512"
+   id="svg84"
+   version="1.1"
+   viewBox="0 0 512 636">
+  <metadata
+     id="metadata90">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>HTML5 Logo Badge</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs88" />
+  <title
+     id="title74">HTML5 Logo Badge</title>
+  <g
+     transform="translate(0,106.6403)"
+     id="g5922">
+    <path
+       d="M 71,460 30,0 h 451 l -41,460 -185,52"
+       id="path76"
+       style="fill:#dab92d;fill-opacity:1;stroke:#e34f26;stroke-opacity:1" />
+    <path
+       d="M 256,472 405,431 440,37 H 256"
+       id="path78"
+       style="fill:#ffd83a;fill-opacity:1" />
+    <path
+       d="m 256,208 h -75 l -5,-58 h 80 V 94 h -1 -141 l 1,15 14,156 h 127 z m 0,147 h -1 l -63,-17 -60,-45 v 0 0 L 176.64168,382 255,414 h 1 z"
+       id="path80"
+       style="fill:#ebebeb;stroke:#e34f26;stroke-opacity:1" />
+    <path
+       d="m 255,208 v 57 h 70 l -7,73 -63,17 v 59 l 116,-32 1,-10 13,-149 2,-15 h -16 z m 0,-114 v 35 21 0 h 100.19252 c 6.97226,0.22951 15.56836,-0.27058 19.29853,1.25029 2.38435,4.83335 -2.17524,13.0794 -6.42941,19.08832 l 27.25324,-32.38437 c 3.51094,-10.23644 4.48864,-18.17097 1.39739,-27.47034 -0.90226,-3.90399 -4.63098,-8.18951 -11.49331,-11.187247 C 368.08327,92.98925 299.61105,95.338458 255,94 Z"
+       id="path82"
+       style="fill:#ffffff;stroke:#ef652a;stroke-opacity:1" />
+    <rect
+       style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:0.82862282;stroke-opacity:1"
+       id="rect5822"
+       width="8.3970623"
+       height="54.999146"
+       x="249.04231"
+       y="94.497452" />
+    <rect
+       style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:0.83548844;stroke-opacity:1"
+       id="rect5822-3"
+       width="8.3970623"
+       height="55.914326"
+       x="249.09079"
+       y="208.50127" />
+    <path
+       style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-opacity:1"
+       d="m 256.56055,355.10742 -1.46485,0.37696 -1.50195,-0.3418 -0.26172,1.14062 0.93164,0.21289 0.20703,0.80274 2.49024,-0.64063 z"
+       id="rect5877" />
+    <path
+       style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-opacity:1"
+       d="m 252.82031,411.0332 -0.55469,1.23633 2.82032,1.26367 1.86133,-0.62109 -0.44141,-1.32031 -1.39844,0.46679 z"
+       id="rect5888" />
+    <rect
+       style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:1.02114868;stroke-opacity:1"
+       id="rect5893"
+       width="2.7350919"
+       height="57.186768"
+       x="253.8577"
+       y="355.72531" />
+    <ellipse
+       style="fill:#ffd83a;fill-opacity:1;stroke:#ef652a;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path5895"
+       cx="385.47525"
+       cy="58.933979"
+       rx="13.26604"
+       ry="3.7245345"
+       transform="rotate(7.7017475)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="55.424492"
+       y="-33.032772"
+       id="text5903"><tspan
+         id="tspan5901"
+         x="55.424492"
+         y="-33.032772"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:74.66666412px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans Bold'">viper<tspan
+   style="fill:#e34f26;fill-opacity:1"
+   id="tspan5905">HTML</tspan></tspan></text>
+  </g>
+</svg>

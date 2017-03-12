@@ -129,7 +129,27 @@ tressa.async(done => {
     onclick="return (e =&gt; e.preventDefault()).call(this, event)"
   >Click Me</a>
   ` === rendered,
-    'multiline attributes'
+    'arrow event'
+  );
+  done();
+});
+
+
+tressa.async(done => {
+  var rendered = viperHTML.wire()`
+  <a
+    href="${'viper.com'}"
+    onclick="${null}"
+  >Click Me</a>
+  `;
+  tressa.assert(
+    `
+  <a
+    href="viper.com"
+    onclick=""
+  >Click Me</a>
+  ` === rendered,
+    'null event'
   );
   done();
 });

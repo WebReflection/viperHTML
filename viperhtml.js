@@ -82,14 +82,18 @@ function updateBoolean(name, copies, i) {
 
 
 // return the right callback to invoke an event
-// stringigying the callback and invoking it
+// stringifying the callback and invoking it
 // to simulate a proper DOM behavior
 function updateEvent(name) {
   return function (value) {
-    var inline = JS_SHORTCUT.test(value) && !JS_FUNCTION.test(value) ?
-      ('function ' + value) :
-      ('' + value);
-    return 'return (' + escape(inline) + ').call(this, event)';
+    var isFunction = typeof value === 'function';
+    return isFunction ?
+      ('return (' + escape(
+        JS_SHORTCUT.test(value) && !JS_FUNCTION.test(value) ?
+          ('function ' + value) :
+          ('' + value)
+      ) + ').call(this, event)') :
+      (value || '');
   };
 }
 

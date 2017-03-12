@@ -14,7 +14,7 @@
 function viperHTML(statics) {
   var viper = vipers.get(this);
   return viper && viper.s === statics ?
-    (this instanceof Async ?
+    (isAsync(this) ?
       this.update : update).apply(viper, arguments) :
     upgrade.apply(this, arguments);
 }
@@ -42,7 +42,7 @@ viperHTML.async = function () {
     chunksReceiver
   ;
   wired.update = function () {
-    this.p = chunksReceiver;
+    this.a = chunksReceiver;
     return chunks.apply(this, arguments);
   };
   return function (callback) {
@@ -89,7 +89,7 @@ function getUpdateForAttribute(copies, i) {
 // if an interpolated value is an Array
 // return Promise or join by empty string
 function getUpdateForHTML(bound) {
-  return bound instanceof Async ?
+  return isAsync(bound) ?
     function (value) { return value; } :
     joinIfArray;
 }
@@ -100,13 +100,33 @@ function joinIfArray(value) {
 }
 
 // return a promise that will invoke each resolved chunk
-function resolveChunk(update, callback, promise, suffix) {
-  return Promise.resolve(promise).then(function (result) {
-    // if it was a Promise.all, join results
-    var value = callback(joinIfArray(result)) + suffix;
-    update(value);
-    return value;
-  });
+function resolveChunk(p, all, update, callback, chunk, suffix) {
+  // an interpolated Array might have nested promises
+  // in this case update all chunks as these come
+  // still following the order
+  return isArray(chunk) ?
+    chunk.reduce(
+      function (p, chunk) {
+        return p.then(function () {
+          return resolveChunk(p, all, update, callback, chunk, '');
+        });
+      },
+      p
+    ).then(function () {
+      // once all of them have been resolved
+      // send the rest of the string
+      update(suffix);
+      all.push(suffix);
+      return suffix;
+    }) :
+    p.then(function () { return Promise.resolve(chunk); })
+     .then(function (result) {
+      // if it was a Promise.all, join results
+      var value = callback(joinIfArray(result)) + suffix;
+      update(value);
+      all.push(value);
+      return value;
+    });
 }
 
 // return the right callback to update a boolean attribute
@@ -144,17 +164,17 @@ function updateEvent() {
 // the context will be a viper
 function chunks() {
   for (var
-    c = this.c,
-    p = this.p,
-    u = this.u,
-    out = [resolveChunk(p, String, c[0], '')],
+    look = [],
+    a = this.a,
+    C = this.c,
+    P = resolveChunk(Promise.resolve(''), look, a, String, C[0], ''),
+    U = this.u,
     i = 1,
-    length = arguments.length;
-    i < length; i++
+    s = arguments.length; i < s; i++
   ) {
-    out[i] = resolveChunk(p, u[i - 1], arguments[i], c[i]);
+    P = resolveChunk(P, look, a, U[i - 1], arguments[i], C[i]);
   }
-  return Promise.all(out);
+  return P.then(function () { return look; });
 }
 
 // each known hyperHTML update is
@@ -219,6 +239,7 @@ var
   escape = require('html-escaper').escape,
   vipers = new WeakMap(),
   wires = new WeakMap(),
+  isAsync = function (o) { return o instanceof Async; },
   isArray = Array.isArray
 ;
 

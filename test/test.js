@@ -227,7 +227,20 @@ tressa.async(done => {
     tressa.assert(all.join('') === '<p>1</p>', 'value to resolve');
   });
 
-  done();
+  wire = viperHTML.async();
+  wire()`<p>${[
+    new Promise(r => setTimeout(r, 10, 1)),
+    Promise.resolve(2),
+    3,
+    [
+      new Promise(r => setTimeout(r, 100, 4)),
+      5,
+      6
+    ]
+  ]}</p>`.then(all => {
+    tressa.assert(all.join('') === '<p>123456</p>', 'nested weirdo values');
+    done();
+  });
 
 })).then(() => tressa.async(done => {
 

@@ -107,3 +107,59 @@ setTimeout(
   )
 );
 ```
+
+
+
+
+### The Extra viperHTML Feature: Asynchronous Partial Output
+
+Clients and servers inevitably have different needs,
+and the ability to serve chunks on demand, instead of a whole page at once,
+is once of these very important differences that wouldn't make much sense on the client side.
+
+If your page content might arrive on demand and is asynchronous,
+`viperHTML` offers an utility to both obtain performance boots,
+and intercepts all chunks of layout, as soon as this is available.
+
+
+#### viperHTML.async()
+
+Similar to a wire, `viperHTML.async()` returns a callback that *must be invoked* right before the template string,
+optionally passing a callback that will be invoked per each available chunk of text, as soon as this is resolved.
+
+```js
+// the view
+const pageLayout = (render, model) =>
+render`<!doctype html>
+<html>
+  <head>${model.head}</head>
+  <body>${model.body}</body>
+</html>`;
+
+// the viper async render
+const asyncRender = viperHTML.async();
+
+// dummy server for one view only
+require('http')
+  .createServer((req, res) => {
+    res.writeHead( 200, {
+      'Content-Type': 'text/html'
+    });
+    pageLayout(
+
+      // res.write(chunk) while resolved
+      asyncRender(chunk => res.write(chunk)),
+
+      // basic model example with async content
+      {
+        head: Promise.resolve('<title>right away</title>'),
+        body: new Promise(res => setTimeout(
+          res, 1000, '<div>later on</div>'
+        ))
+      }
+    )
+    .then(all => res.end())
+    .catch(err => { console.error(err); res.end(); });
+  })
+  .listen(8000);
+```

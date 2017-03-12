@@ -14,7 +14,8 @@
 function viperHTML(statics) {
   var viper = vipers.get(this);
   return viper && viper.s === statics ?
-    update.apply(viper, arguments) :
+    (this instanceof Async ?
+      this.update : update).apply(viper, arguments) :
     upgrade.apply(this, arguments);
 }
 
@@ -32,6 +33,22 @@ viperHTML.wire = function wire(object) {
       wires.set(object, wire()),
       wire(object)
     ));
+};
+
+viperHTML.async = function () {
+  var
+    wired = new Async,
+    wire = viperHTML.bind(wired),
+    chunksReceiver
+  ;
+  wired.update = function () {
+    this.p = chunksReceiver;
+    return chunks.apply(this, arguments);
+  };
+  return function (callback) {
+    chunksReceiver = callback || String;
+    return wire;
+  };
 };
 
 // - - - - - - - - - - - - - - - - - -  - - - - -
@@ -64,9 +81,32 @@ function getUpdateForAttribute(copies, i) {
   var name = copies[i - 1].replace(ATTRIBUTE_NAME, '$1');
   return SPECIAL_ATTRIBUTE.test(name) ?
     (ATTRIBUTE_EVENT.test(name) ?
-      updateEvent(name) :
+      updateEvent() :
       updateBoolean(name, copies, i)) :
     escape;
+}
+
+// if an interpolated value is an Array
+// return Promise or join by empty string
+function getUpdateForHTML(bound) {
+  return bound instanceof Async ?
+    function (value) { return value; } :
+    joinIfArray;
+}
+
+// multiple content joined as single string
+function joinIfArray(value) {
+  return isArray(value) ? value.join('') : value;
+}
+
+// return a promise that will invoke each resolved chunk
+function resolveChunk(update, callback, promise, suffix) {
+  return Promise.resolve(promise).then(function (result) {
+    // if it was a Promise.all, join results
+    var value = callback(joinIfArray(result)) + suffix;
+    update(value);
+    return value;
+  });
 }
 
 // return the right callback to update a boolean attribute
@@ -80,11 +120,10 @@ function updateBoolean(name, copies, i) {
   };
 }
 
-
 // return the right callback to invoke an event
 // stringifying the callback and invoking it
 // to simulate a proper DOM behavior
-function updateEvent(name) {
+function updateEvent() {
   return function (value) {
     var isFunction = typeof value === 'function';
     return isFunction ?
@@ -101,8 +140,26 @@ function updateEvent(name) {
 // Template setup
 // -------------------------
 
+// resolves through promises
+// the context will be a viper
+function chunks() {
+  for (var
+    c = this.c,
+    p = this.p,
+    u = this.u,
+    out = [resolveChunk(p, String, c[0], '')],
+    i = 1,
+    length = arguments.length;
+    i < length; i++
+  ) {
+    out[i] = resolveChunk(p, u[i - 1], arguments[i], c[i]);
+  }
+  return Promise.all(out);
+}
+
 // each known hyperHTML update is
 // kept as simple as possible.
+// the context will be a viper
 function update() {
   for (var
     c = this.c,
@@ -120,6 +177,7 @@ function update() {
 // but the first time, it needs to be setup.
 // From now on, only update(statics) will be called
 // unless this context won't be used for other renderings.
+// the context will be the one bound to viperHTML
 function upgrade(statics) {
   for (var
     updates = [],
@@ -130,13 +188,13 @@ function upgrade(statics) {
     i < length; i++
   ) {
     updates[i - 1] = isHTML(statics, i) ?
-      String :
+      getUpdateForHTML(this) :
       (isAttribute(copies, i) ?
         getUpdateForAttribute(copies, i) :
         escape);
   }
   vipers.set(this, viper);
-  return update.apply(viper, arguments);
+  return viperHTML.apply(this, arguments);
 }
 
 // -------------------------
@@ -160,7 +218,8 @@ var
   SPECIAL_ATTRIBUTE = require('hyperhtml').SPECIAL_ATTRIBUTE,
   escape = require('html-escaper').escape,
   vipers = new WeakMap(),
-  wires = new WeakMap()
+  wires = new WeakMap(),
+  isArray = Array.isArray
 ;
 
 // let's cleanup this property now
@@ -170,3 +229,6 @@ delete global.document;
 viperHTML.SPECIAL_ATTRIBUTE = SPECIAL_ATTRIBUTE;
 
 module.exports = viperHTML;
+
+// local class to easily recognize async wires
+function Async() {}

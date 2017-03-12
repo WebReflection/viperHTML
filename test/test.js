@@ -114,7 +114,6 @@ tressa.async(done => {
   done();
 });
 
-
 tressa.async(done => {
   var rendered = viperHTML.wire()`
   <a
@@ -154,7 +153,83 @@ tressa.async(done => {
   done();
 });
 
+
 tressa.async(done => {
+  var chunks = [];
+
+  var asyncWire = viperHTML.async();
+
+  // an asyncWire is an intermediate function
+  // that allows to specify a callback
+  // which will receive all chunks as these
+  // will be resolved.
+  // An asyncWire always returns a Promise.all
+  // that will resolve once all chunks will be available.
+  (asyncWire(chunk => chunks.push(chunk))`
+  <a
+    href="${Promise.resolve('viper.com')}"
+    onclick="${Promise.resolve(null)}"
+  >Click Me</a>
+  `).then(all => {
+
+    tressa.assert(
+    `
+  <a
+    href="viper.com"
+    onclick=""
+  >Click Me</a>
+  ` === all.join(''),
+    'callback resolved through promises'
+  );
+
+    tressa.assert(
+      chunks.join('') === all.join(''),
+      'all chunks notified'
+    );
+
+    (asyncWire()`
+  <a
+    href="${Promise.resolve('viper.com')}"
+    onclick="${Promise.resolve(null)}"
+  >Click Me</a>
+  `).then(all => {
+
+    tressa.assert(
+    `
+  <a
+    href="viper.com"
+    onclick=""
+  >Click Me</a>
+  ` === all.join(''),
+    'no errors without callback'
+  );
+
+    done();
+  });
+
+  });
+
+}).then(() => 
+tressa.async(done => {
+  var wire = viperHTML.wire();
+  tressa.assert(
+    wire`<p>${[1,2,3]}</p>` === '<p>123</p>',
+    'array as HTML'
+  );
+
+  wire = viperHTML.async();
+  wire()`<p>${Promise.all([1,Promise.resolve(2),3])}</p>`.then(all => {
+    tressa.assert(all.join('') === '<p>123</p>', 'array as Promise.all');
+  });
+
+  wire = viperHTML.async();
+  wire()`<p>${1}</p>`.then(all => {
+    tressa.assert(all.join('') === '<p>1</p>', 'value to resolve');
+  });
+
+  done();
+
+})).then(() => tressa.async(done => {
 
   tressa.log('');
   tressa.log('## basic benchmark');
@@ -175,7 +250,6 @@ tressa.async(done => {
   };
 
   var link = viperHTML.bind(a);
-  var out = '';
 
   var benchName = 'first call: upgrade + update';
   console.time(benchName);
@@ -202,6 +276,6 @@ tressa.async(done => {
   console.timeEnd(benchName);
 
   done();
-});
+}));
 
 

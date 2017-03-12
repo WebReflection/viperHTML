@@ -211,13 +211,18 @@ tressa.async(done => {
 
 }).then(() => 
 tressa.async(done => {
+  var ref = {};
+
   var wire = viperHTML.wire();
   tressa.assert(
     wire`<p>${[1,2,3]}</p>` === '<p>123</p>',
     'array as HTML'
   );
 
-  wire = viperHTML.async();
+  wire = viperHTML.async(ref);
+
+  tressa.assert(wire === viperHTML.async(ref), 'weakly referenced async wires');
+
   wire()`<p>${Promise.all([1,Promise.resolve(2),3])}</p>`.then(all => {
     tressa.assert(all.join('') === '<p>123</p>', 'array as Promise.all');
   });

@@ -35,20 +35,22 @@ viperHTML.wire = function wire(object) {
     ));
 };
 
-viperHTML.async = function () {
-  var
-    wired = new Async,
-    wire = viperHTML.bind(wired),
-    chunksReceiver
-  ;
-  wired.update = function () {
-    this.a = chunksReceiver;
-    return chunks.apply(this, arguments);
-  };
-  return function (callback) {
-    chunksReceiver = callback || String;
-    return wire;
-  };
+// An asynchronous wire ➰ is a weakly referenced callback,
+// to be invoked right before the template literals
+// to return a rendered capable of resolving chunks.
+// or a runtime created one, to a specific template.
+//
+// var render = viperHTML.wire();
+// render`
+//  <div>Hello Wired!</div>
+// `;
+viperHTML.async = function getAsync(object) {
+  return arguments.length < 1 ?
+    createAsync() :
+    (asyncs.get(object) || (
+      asyncs.set(object, getAsync()),
+      getAsync(object)
+    ));
 };
 
 // - - - - - - - - - - - - - - - - - -  - - - - -
@@ -74,6 +76,25 @@ function isHTML(statics, i) {
 // -------------------------
 // Helpers
 // -------------------------
+
+// instrument a wire to work asynchronously
+// passing along an optional resolved chunks
+// interceptor callback
+function createAsync() {
+  var
+    wired = new Async,
+    wire = viperHTML.bind(wired),
+    chunksReceiver
+  ;
+  wired.update = function () {
+    this.a = chunksReceiver;
+    return chunks.apply(this, arguments);
+  };
+  return function (callback) {
+    chunksReceiver = callback || String;
+    return wire;
+  };
+}
 
 // if a node is an attribute, return the right function
 // accordingly if that's an escape or a callback
@@ -237,6 +258,7 @@ var
   JS_FUNCTION = /^function\S*?\(/,
   SPECIAL_ATTRIBUTE = require('hyperhtml').SPECIAL_ATTRIBUTE,
   escape = require('html-escaper').escape,
+  asyncs = new WeakMap(),
   vipers = new WeakMap(),
   wires = new WeakMap(),
   isAsync = function (o) { return o instanceof Async; },

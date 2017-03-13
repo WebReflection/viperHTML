@@ -38,12 +38,6 @@ viperHTML.wire = function wire(object) {
 // An asynchronous wire ➰ is a weakly referenced callback,
 // to be invoked right before the template literals
 // to return a rendered capable of resolving chunks.
-// or a runtime created one, to a specific template.
-//
-// var render = viperHTML.wire();
-// render`
-//  <div>Hello Wired!</div>
-// `;
 viperHTML.async = function getAsync(object) {
   return arguments.length < 1 ?
     createAsync() :
@@ -120,36 +114,6 @@ function joinIfArray(value) {
   return isArray(value) ? value.join('') : value;
 }
 
-// return a promise that will invoke each resolved chunk
-function resolveChunk(p, all, update, callback, chunk, suffix) {
-  // an interpolated Array might have nested promises
-  // in this case update all chunks as these come
-  // still following the order
-  return isArray(chunk) ?
-    chunk.reduce(
-      function (p, chunk) {
-        return p.then(function () {
-          return resolveChunk(p, all, update, callback, chunk, '');
-        });
-      },
-      p
-    ).then(function () {
-      // once all of them have been resolved
-      // send the rest of the string
-      update(suffix);
-      all.push(suffix);
-      return suffix;
-    }) :
-    p.then(function () { return Promise.resolve(chunk); })
-     .then(function (result) {
-      // if it was a Promise.all, join results
-      var value = callback(joinIfArray(result)) + suffix;
-      update(value);
-      all.push(value);
-      return value;
-    });
-}
-
 // return the right callback to update a boolean attribute
 // after modifying the template to ignore such attribute if falsy
 function updateBoolean(name, copies, i) {
@@ -181,21 +145,42 @@ function updateEvent() {
 // Template setup
 // -------------------------
 
-// resolves through promises
+// resolves through promises and
+// invoke a notifier per each resolved chunk
 // the context will be a viper
 function chunks() {
   for (var
-    look = [],
-    a = this.a,
-    C = this.c,
-    P = resolveChunk(Promise.resolve(''), look, a, String, C[0], ''),
-    U = this.u,
+    update,
+    notify = this.a,
+    copies = this.c,
+    updates = this.u,
+    all = Promise.resolve(copies[0]),
+    getValue = function (value) {
+      if (isArray(value)) {
+        value.forEach(getValue);
+      } else {
+        all = chain(
+          Promise.resolve(value)
+                 .then(joinIfArray)
+                 .then(update)
+        );
+      }
+    },
+    chain = function (after) {
+      return all.then(joinIfArray)
+                .then(function (through) {
+                  notify(through);
+                  return after;
+                });
+    },
     i = 1,
-    s = arguments.length; i < s; i++
+    length = arguments.length; i < length; i++
   ) {
-    P = resolveChunk(P, look, a, U[i - 1], arguments[i], C[i]);
+    update = updates[i - 1];
+    getValue(arguments[i]);
+    all = chain(copies[i]);
   }
-  return P.then(function () { return look; });
+  return all.then(notify);
 }
 
 // each known hyperHTML update is

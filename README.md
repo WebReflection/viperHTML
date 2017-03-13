@@ -158,7 +158,7 @@ require('http')
         ))
       }
     )
-    .then(all => res.end())
+    .then(() => res.end())
     .catch(err => { console.error(err); res.end(); });
   })
   .listen(8000);

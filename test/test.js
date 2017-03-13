@@ -170,7 +170,7 @@ tressa.async(done => {
     href="${Promise.resolve('viper.com')}"
     onclick="${Promise.resolve(null)}"
   >Click Me</a>
-  `).then(all => {
+  `).then(() => {
 
     tressa.assert(
     `
@@ -178,32 +178,17 @@ tressa.async(done => {
     href="viper.com"
     onclick=""
   >Click Me</a>
-  ` === all.join(''),
-    'callback resolved through promises'
+  ` === chunks.join(''),
+    'chunks resolved through promises'
   );
 
-    tressa.assert(
-      chunks.join('') === all.join(''),
-      'all chunks notified'
-    );
 
     (asyncWire()`
   <a
     href="${Promise.resolve('viper.com')}"
     onclick="${Promise.resolve(null)}"
   >Click Me</a>
-  `).then(all => {
-
-    tressa.assert(
-    `
-  <a
-    href="viper.com"
-    onclick=""
-  >Click Me</a>
-  ` === all.join(''),
-    'no errors without callback'
-  );
-
+  `).then(() => {
     done();
   });
 
@@ -223,31 +208,41 @@ tressa.async(done => {
 
   tressa.assert(wire === viperHTML.async(ref), 'weakly referenced async wires');
 
-  wire()`<p>${Promise.all([1,Promise.resolve(2),3])}</p>`.then(all => {
-    tressa.assert(all.join('') === '<p>123</p>', 'array as Promise.all');
+  var all1 = [];
+  wire(all1.push.bind(all1))`<p>${Promise.all([1,Promise.resolve(2),3])}</p>`.then(() => {
+    tressa.assert(all1.join('') === '<p>123</p>', 'array as Promise.all');
   });
 
+  var all2 = [];
   wire = viperHTML.async();
-  wire()`<p>${1}</p>`.then(all => {
-    tressa.assert(all.join('') === '<p>1</p>', 'value to resolve');
-  });
-
-  wire = viperHTML.async();
-  wire()`<p>${[
-    new Promise(r => setTimeout(r, 10, 1)),
-    Promise.resolve(2),
-    3,
-    [
-      new Promise(r => setTimeout(r, 100, 4)),
-      5,
-      6
-    ]
-  ]}</p>`.then(all => {
-    tressa.assert(all.join('') === '<p>123456</p>', 'nested weirdo values');
+  wire(all2.push.bind(all2))`<p>${1}</p>`.then(() => {
+    tressa.assert(all2.join('') === '<p>1</p>', 'value to resolve');
     done();
   });
 
-})).then(() => tressa.async(done => {
+}))
+.then(() => tressa.async(done => {
+  var all3 = [];
+  wire = viperHTML.async();
+  wire((chunk) => {
+    tressa.log(`  #grey(${chunk})`);
+    all3.push(chunk);
+  })`<p>${[
+    new Promise(r => setTimeout(r, 100, 1)),
+    Promise.resolve(2),
+    3,
+    [
+      new Promise(r => setTimeout(r, 300, 4)),
+      new Promise(r => setTimeout(r, 500, 5)),
+      Promise.all([6, 7])
+    ],
+    new Promise(r => setTimeout(r, 100, 8))
+  ]}</p>`.then(() => {
+    tressa.assert(all3.join('') === '<p>12345678</p>', 'nested weirdo values');
+    done();
+  });
+}))
+.then(() => tressa.async(done => {
 
   tressa.log('');
   tressa.log('## basic benchmark');

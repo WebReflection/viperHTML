@@ -167,8 +167,7 @@ function chunks() {
       }
     },
     chain = function (after) {
-      return all.then(joinIfArray)
-                .then(function (through) {
+      return all.then(function (through) {
                   notify(through);
                   return after;
                 });

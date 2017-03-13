@@ -163,3 +163,54 @@ require('http')
   })
   .listen(8000);
 ```
+
+
+### Handy Patterns
+Following a list of handy patterns to solve common issues.
+
+#### HTML in template literals doesn't get highlighted
+True that, but if you follow a simple `(render, model)` convetion,
+you can just have templates as html files.
+```html
+<!-- template/tick.html -->
+<div>
+  <h1>Hello, ${model.name}!</h1>
+  <h2>It is ${new Date().toLocaleTimeString()}.</h2>
+</div>
+```
+At this point, you can generate as many views as you want through the following step
+```sh
+#!/usr/bin/env bash
+
+mkdir -p view
+
+for f in $(ls template); do
+  echo 'module.exports = (render, model) => render`' > "view/${f:0:-4}js"
+  cat template/$f >> "view/${f:0:-4}js"
+  echo '`;' >> "view/${f:0:-4}js"
+done
+```
+
+As result, the folder `view` will now contain a `tick.js` file as such:
+```js
+module.exports = (render, model) => render`
+<!-- template/tick.html -->
+<div>
+  <h1>Hello, ${model.name}!</h1>
+  <h2>It is ${new Date().toLocaleTimeString()}.</h2>
+</div>
+`;
+```
+
+You can now use each view as modules.
+```js
+const view = {
+  tick: require('./view/tick')
+};
+
+// show the result in console
+console.log(view.tick(
+  viperHTML.wire(),
+  {name: 'user'}
+));
+```

@@ -151,10 +151,17 @@ function updateEvent() {
 function chunks() {
   for (var
     update,
-    notify = this.a,
+    out = [],
+    asyncCallback = this.a,
     copies = this.c,
     updates = this.u,
     all = Promise.resolve(copies[0]),
+    chain = function (after) {
+      return all.then(function (through) {
+                  notify(through);
+                  return after;
+                });
+    },
     getValue = function (value) {
       if (isArray(value)) {
         value.forEach(getValue);
@@ -166,11 +173,9 @@ function chunks() {
         );
       }
     },
-    chain = function (after) {
-      return all.then(function (through) {
-                  notify(through);
-                  return after;
-                });
+    notify = function (chunk) {
+      out.push(chunk);
+      asyncCallback(chunk);
     },
     i = 1,
     length = arguments.length; i < length; i++
@@ -179,7 +184,7 @@ function chunks() {
     getValue(arguments[i]);
     all = chain(copies[i]);
   }
-  return all.then(notify);
+  return all.then(notify).then(function () { return out; });
 }
 
 // each known hyperHTML update is

@@ -194,7 +194,28 @@ tressa.async(done => {
 
   });
 
-}).then(() => 
+})
+.then(() => 
+tressa.async(done => {
+  var subRef = [];
+  var subAsync = viperHTML.async();
+  var parentRef = [];
+  var parentAsync = viperHTML.async();
+
+
+  (parentAsync(parentRef.push.bind(parentRef))`<p>${[
+    1,
+    subAsync(subRef.push.bind(subRef))`<span>${[2, Promise.resolve(3), 4]}</span>`,
+    5
+  ]}</p>`).then(result => {
+    tressa.assert(subRef.join('') === '<span>234</span>', 'sub chunks are correct');
+    tressa.assert(parentRef.join('') === result.join(''), 'chunks are like the result');
+    tressa.assert(result.join('') === '<p>1<span>234</span>5</p>', 'result is correct');
+    done();
+  });
+
+}))
+.then(() => 
 tressa.async(done => {
   var ref = {};
 
@@ -215,8 +236,9 @@ tressa.async(done => {
 
   var all2 = [];
   wire = viperHTML.async();
-  wire(all2.push.bind(all2))`<p>${1}</p>`.then(() => {
+  wire(all2.push.bind(all2))`<p>${1}</p>`.then(all => {
     tressa.assert(all2.join('') === '<p>1</p>', 'value to resolve');
+    tressa.assert(all2.join('') === all.join(''), 'final all is the same');
     done();
   });
 
@@ -237,8 +259,9 @@ tressa.async(done => {
       Promise.all([6, 7])
     ],
     new Promise(r => setTimeout(r, 100, 8))
-  ]}</p>`.then(() => {
+  ]}</p>`.then(all => {
     tressa.assert(all3.join('') === '<p>12345678</p>', 'nested weirdo values');
+    tressa.assert(all3.join('') === all.join(''), 'all is the same');
     done();
   });
 }))

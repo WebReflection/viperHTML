@@ -77,6 +77,16 @@ tressa.async(done => {
   done();
 });
 
+
+tressa.async(done => {
+  var rendered = viperHTML.wire()`<p class="${undefined}">${null}<p> ${undefined}`;
+  tressa.assert(
+    `<p class="undefined">null<p> undefined` === rendered,
+    'null and undefined do not throw'
+  );
+  done();
+});
+
 tressa.async(done => {
   tressa.assert(
     viperHTML.wire()`>${'not "HTML"'}` === '>not &quot;HTML&quot;',

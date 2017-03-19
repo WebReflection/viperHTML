@@ -246,10 +246,11 @@ var
   JS_SHORTCUT = /^[a-z$_]\S*?\(/,
   JS_FUNCTION = /^function\S*?\(/,
   SPECIAL_ATTRIBUTE = require('hyperhtml').SPECIAL_ATTRIBUTE,
-  escape = require('html-escaper').escape,
+  htmlEscape = require('html-escaper').escape,
   asyncs = new WeakMap(),
   vipers = new WeakMap(),
   wires = new WeakMap(),
+  escape = function (s) { return htmlEscape(String(s)); },
   isAsync = function (o) { return o instanceof Async; },
   isArray = Array.isArray
 ;

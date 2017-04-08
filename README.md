@@ -2,6 +2,13 @@
 
 [hyperHTML](https://github.com/WebReflection/hyperHTML) lightness, ease, and performance, for both client and server.
 
+- - -
+Don't miss the [viperHTML](https://github.com/WebReflection/viperHTML) version of **Hacker News**
+
+Live: https://viper-news.now.sh/
+
+Repo: https://github.com/WebReflection/viper-news
+- - -
 
 ### Same API without DOM constrains
 On browsers, `viperHTML` is simply a reference to [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e#.bgosolrh0),

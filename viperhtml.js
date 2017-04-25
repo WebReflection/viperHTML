@@ -245,7 +245,7 @@ var
   ATTRIBUTE_EVENT = /^on[a-z]+$/,
   JS_SHORTCUT = /^[a-z$_]\S*?\(/,
   JS_FUNCTION = /^function\S*?\(/,
-  SPECIAL_ATTRIBUTE = require('hyperhtml').SPECIAL_ATTRIBUTE,
+  SPECIAL_ATTRIBUTE = /^(?:(?:on|allow)[a-z]+|async|autofocus|autoplay|capture|checked|controls|default|defer|disabled|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|nomodule|novalidate|open|playsinline|readonly|required|reversed|selected|truespeed|typemustmatch|usecache)$/,
   htmlEscape = require('html-escaper').escape,
   asyncs = new WeakMap(),
   vipers = new WeakMap(),
@@ -257,9 +257,6 @@ var
 
 // let's cleanup this property now
 delete global.document;
-
-// just to mimic hyperHTML public statics
-viperHTML.SPECIAL_ATTRIBUTE = SPECIAL_ATTRIBUTE;
 
 module.exports = viperHTML;
 

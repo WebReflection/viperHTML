@@ -1,8 +1,8 @@
 # viperHTML [![Build Status](https://travis-ci.org/WebReflection/hyperHTML.svg?branch=master)](https://travis-ci.org/WebReflection/viperHTML) [![Coverage Status](https://coveralls.io/repos/github/WebReflection/viperHTML/badge.svg?branch=master)](https://coveralls.io/github/WebReflection/viperHTML?branch=master)
 
-[hyperHTML](https://github.com/WebReflection/hyperHTML) lightness, ease, and performance, for both client and server.
-
 <img alt="viperHTML logo" src="https://webreflection.github.io/hyperHTML/logo/viperhtml.svg" width="116" height="81">
+
+[hyperHTML](https://github.com/WebReflection/hyperHTML) lightness, ease, and performance, for both client and server.
 
 - - -
 Don't miss the [viperHTML](https://github.com/WebReflection/viperHTML) version of **Hacker News**

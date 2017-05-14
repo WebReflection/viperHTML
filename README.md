@@ -2,7 +2,10 @@
 
 [hyperHTML](https://github.com/WebReflection/hyperHTML) lightness, ease, and performance, for both client and server.
 
-![viperHTML logo](./logo/viperhtml.png)
+<img alt="viperHTML logo" src="https://webreflection.github.io/hyperHTML/logo/viperhtml.svg" width="116" height="81">
+
+https://webreflection.github.io/hyperHTML/logo/viperhtml.svg
+
 
 - - -
 Don't miss the [viperHTML](https://github.com/WebReflection/viperHTML) version of **Hacker News**

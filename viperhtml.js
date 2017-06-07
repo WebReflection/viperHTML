@@ -29,10 +29,7 @@ function viperHTML(statics) {
 viperHTML.wire = function wire(object) {
   return arguments.length < 1 ?
     viperHTML.bind({}) :
-    (wires.get(object) || (
-      wires.set(object, wire()),
-      wire(object)
-    ));
+    (wires.get(object) || setWM(wires, object, viperHTML.bind({})));
 };
 
 // An asynchronous wire ➰ is a weakly referenced callback,
@@ -41,10 +38,7 @@ viperHTML.wire = function wire(object) {
 viperHTML.async = function getAsync(object) {
   return arguments.length < 1 ?
     createAsync() :
-    (asyncs.get(object) || (
-      asyncs.set(object, getAsync()),
-      getAsync(object)
-    ));
+    (asyncs.get(object) || setWM(asyncs, object, createAsync()));
 };
 
 // - - - - - - - - - - - - - - - - - -  - - - - -
@@ -112,6 +106,12 @@ function getUpdateForHTML(bound) {
 // multiple content joined as single string
 function joinIfArray(value) {
   return isArray(value) ? value.join('') : value;
+}
+
+// weakly relate a generic object to a genric value
+function setWM(wm, object, value) {
+  wm.set(object, value);
+  return value;
 }
 
 // return the right callback to update a boolean attribute
@@ -187,7 +187,7 @@ function chunks() {
   return all.then(notify).then(function () { return out; });
 }
 
-// each known hyperHTML update is
+// each known viperHTML update is
 // kept as simple as possible.
 // the context will be a viper
 function update() {

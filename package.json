@@ -28,8 +28,8 @@
   },
   "homepage": "https://github.com/WebReflection/viperHTML#readme",
   "dependencies": {
-    "html-escaper": "^1.0.0",
-    "hyperhtml": "^0.11.7"
+    "html-escaper": "^1.0.1",
+    "hyperhtml": "^0.11.9"
   },
   "devDependencies": {
     "coveralls": "^2.12.0",

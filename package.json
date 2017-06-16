@@ -29,7 +29,7 @@
   "homepage": "https://github.com/WebReflection/viperHTML#readme",
   "dependencies": {
     "html-escaper": "^1.0.1",
-    "hyperhtml": "^0.11.12"
+    "hyperhtml": "^0.12.0"
   },
   "devDependencies": {
     "coveralls": "^2.12.0",

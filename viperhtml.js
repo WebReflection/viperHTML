@@ -11,12 +11,17 @@
 //    ${(new Date).toLocaleString()}
 //  </p>
 // `;
-function viperHTML(statics) {
+function viperHTML(template) {
   var viper = vipers.get(this);
-  return viper && viper.s === statics ?
-    (isAsync(this) ?
-      this.update : update).apply(viper, arguments) :
-    upgrade.apply(this, arguments);
+    if (
+      !viper ||
+      viper.template !== template
+    ) {
+      viper = upgrade.apply(this, arguments);
+      vipers.set(this, viper);
+    }
+    return (this instanceof Async ? this.update : update)
+            .apply(viper, arguments);
 }
 
 // A wire ➰ is a shortcut to relate a specific object,
@@ -26,19 +31,22 @@ function viperHTML(statics) {
 // render`
 //  <div>Hello Wired!</div>
 // `;
-viperHTML.wire = function wire(object) {
+viperHTML.wire = function wire(obj, type) {
   return arguments.length < 1 ?
-    viperHTML.bind({}) :
-    (wires.get(object) || setWM(wires, object, viperHTML.bind({})));
+      viperHTML.bind({}) :
+      (obj == null ?
+        viperHTML.bind({}) :
+        wireWeakly(obj, type || 'html')
+      );
 };
 
 // An asynchronous wire ➰ is a weakly referenced callback,
 // to be invoked right before the template literals
 // to return a rendered capable of resolving chunks.
-viperHTML.async = function getAsync(object) {
+viperHTML.async = function getAsync(obj) {
   return arguments.length < 1 ?
     createAsync() :
-    (asyncs.get(object) || setWM(asyncs, object, createAsync()));
+    (asyncs.get(obj) || setWM(asyncs, obj, createAsync()));
 };
 
 // - - - - - - - - - - - - - - - - - -  - - - - -
@@ -57,8 +65,13 @@ function isAttribute(copies, i) {
 // if a gap is in between html elements
 // allow any sort of HTML content
 function isHTML(statics, i) {
-  return statics[i - 1].slice(-1) === '>' &&
-         statics[i][0] === '<';
+  var
+    before = statics[i - 1],
+    after = statics[i],
+    length = before.length
+  ;
+  return  (length < 1 || before[length - 1] === '>') &&
+          (after.length < 1 || after[0] === '<');
 }
 
 // -------------------------
@@ -75,13 +88,53 @@ function createAsync() {
     chunksReceiver
   ;
   wired.update = function () {
-    this.a = chunksReceiver;
+    this.callback = chunksReceiver;
     return chunks.apply(this, arguments);
   };
   return function (callback) {
     chunksReceiver = callback || String;
     return wire;
   };
+}
+
+// given a template object
+// retrieve the list of needed updates
+// each time new interpolations are passed along
+function createUpdates(template) {
+  for (var
+    updates = [],
+    copies = template.slice(),
+    i = 1,
+    length = template.length;
+    i < length; i++
+  ) {
+    updates[i - 1] = isHTML(template, i) ?
+      getUpdateForHTML :
+      (isAttribute(copies, i) ?
+        getUpdateForAttribute(copies, i) :
+        escape);
+  }
+  return {
+    updates: updates,
+    copies: copies
+  };
+}
+
+// given a list of updates
+// create a copy with the right update for HTML
+function fixUpdates(updates) {
+  for (var
+    update,
+    i = 0,
+    length = updates.length,
+    out = new Array(length);
+    i < length; i++
+  ) {
+    update = updates[i];
+    out[i] = update === getUpdateForHTML ?
+              update.call(this) : update;
+  }
+  return out;
 }
 
 // if a node is an attribute, return the right function
@@ -97,15 +150,17 @@ function getUpdateForAttribute(copies, i) {
 
 // if an interpolated value is an Array
 // return Promise or join by empty string
-function getUpdateForHTML(bound) {
-  return isAsync(bound) ?
-    function (value) { return value; } :
-    joinIfArray;
+function getUpdateForHTML() {
+  return this instanceof Async ? identity : joinIfArray;
 }
 
 // multiple content joined as single string
 function joinIfArray(value) {
   return isArray(value) ? value.join('') : value;
+}
+
+function identity(value) {
+  return value;
 }
 
 // weakly relate a generic object to a genric value
@@ -152,9 +207,9 @@ function chunks() {
   for (var
     update,
     out = [],
-    asyncCallback = this.a,
-    copies = this.c,
-    updates = this.u,
+    updates = this.updates,
+    copies = this.copies,
+    callback = this.callback,
     all = Promise.resolve(copies[0]),
     chain = function (after) {
       return all.then(function (through) {
@@ -169,13 +224,13 @@ function chunks() {
         all = chain(
           Promise.resolve(value)
                  .then(joinIfArray)
-                 .then(update)
+                 .then(update === joinIfArray ? identity : update)
         );
       }
     },
     notify = function (chunk) {
       out.push(chunk);
-      asyncCallback(chunk);
+      callback(chunk);
     },
     i = 1,
     length = arguments.length; i < length; i++
@@ -192,39 +247,38 @@ function chunks() {
 // the context will be a viper
 function update() {
   for (var
-    c = this.c,
-    u = this.u,
-    out = [c[0]],
+    updates = this.updates,
+    copies = this.copies,
     i = 1,
-    length = arguments.length;
+    length = arguments.length,
+    out = [copies[0]];
     i < length; i++
   ) {
-    out[i] = u[i - 1](arguments[i]) + c[i];
+    out.push(updates[i - 1](arguments[i]), copies[i]);
   }
   return out.join('');
 }
 
 // but the first time, it needs to be setup.
-// From now on, only update(statics) will be called
+// From now on, only update(tempalte) will be called
 // unless this context won't be used for other renderings.
-// the context will be the one bound to viperHTML
-function upgrade(statics) {
-  for (var
-    updates = [],
-    copies = updates.slice.call(statics),
-    viper = {s: statics, u: updates, c: copies},
-    i = 1,
-    length = statics.length;
-    i < length; i++
-  ) {
-    updates[i - 1] = isHTML(statics, i) ?
-      getUpdateForHTML(this) :
-      (isAttribute(copies, i) ?
-        getUpdateForAttribute(copies, i) :
-        escape);
-  }
-  vipers.set(this, viper);
-  return viperHTML.apply(this, arguments);
+function upgrade(template) {
+  var info = templates.get(template) ||
+      setWM(templates, template, createUpdates(template));
+  return {
+    template: template,
+    updates: fixUpdates.call(this, info.updates),
+    copies: info.copies
+  };
+}
+
+// -------------------------
+// Wires
+// -------------------------
+
+function wireWeakly(obj, id) {
+  var wire = wires.get(obj) || setWM(wires, obj, new Dict);
+  return wire[id] || (wire[id] = viperHTML.bind({}));
 }
 
 // -------------------------
@@ -247,11 +301,11 @@ var
   JS_FUNCTION = /^function\S*?\(/,
   SPECIAL_ATTRIBUTE = /^(?:(?:on|allow)[a-z]+|async|autofocus|autoplay|capture|checked|controls|default|defer|disabled|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|nomodule|novalidate|open|playsinline|readonly|required|reversed|selected|truespeed|typemustmatch|usecache)$/,
   htmlEscape = require('html-escaper').escape,
+  templates = new Map(),
   asyncs = new WeakMap(),
   vipers = new WeakMap(),
   wires = new WeakMap(),
   escape = function (s) { return htmlEscape(String(s)); },
-  isAsync = function (o) { return o instanceof Async; },
   isArray = Array.isArray
 ;
 
@@ -262,3 +316,7 @@ module.exports = viperHTML;
 
 // local class to easily recognize async wires
 function Async() {}
+
+// local class to easily create wires
+function Dict() {}
+Dict.prototype = Object.create(null);

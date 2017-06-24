@@ -81,7 +81,7 @@ tressa.async(done => {
 tressa.async(done => {
   var rendered = viperHTML.wire()`<p class="${undefined}">${null}<p> ${undefined}`;
   tressa.assert(
-    `<p class="undefined">null<p> undefined` === rendered,
+    `<p class="undefined"><p> undefined` === rendered,
     'null and undefined do not throw'
   );
   done();
@@ -89,12 +89,12 @@ tressa.async(done => {
 
 tressa.async(done => {
   tressa.assert(
-    viperHTML.wire()`>${'not "HTML"'}` === '>not &quot;HTML&quot;',
-    '> escaped HTML'
+    viperHTML.wire()`>${'"HTML"'}` === '>"HTML"',
+    '> unescaped HTML'
   );
   tressa.assert(
-    viperHTML.wire()`${'not "HTML"'}<` === 'not &quot;HTML&quot;<',
-    'escaped HTML <'
+    viperHTML.wire()`${'"HTML"'}<` === '"HTML"<',
+    'unescaped HTML <'
   );
   tressa.assert(
     viperHTML.wire()`<a onclick=${'"'}>` === '<a onclick=&quot;>',
@@ -276,6 +276,26 @@ tressa.async(done => {
   });
 }))
 .then(() => tressa.async(done => {
+  tressa.log('## hyperHTML behaviors');
+
+  tressa.assert(viperHTML.bind({})`${['<br>']}` === '<br>', 'empty templates');
+
+  var ref = {};
+  tressa.assert(
+    viperHTML.wire(ref, ':1') === viperHTML.wire(ref, ':1') &&
+    viperHTML.wire(ref, ':1') !== viperHTML.wire(ref, ':2') &&
+    viperHTML.wire(ref, ':2') === viperHTML.wire(ref, ':2'),
+    'wires now accept ids'
+  );
+
+  tressa.assert(
+    viperHTML.wire(null, ':1') !== viperHTML.wire(null, ':2'),
+    'wires could be null too'
+  );
+
+  done();
+}))
+.then(() => tressa.async(done => {
 
   tressa.log('');
   tressa.log('## basic benchmark');
@@ -314,7 +334,7 @@ tressa.async(done => {
   }
   console.timeEnd(benchName);
 
-  benchName = 'a thousand of uncached upgrade + update calls';
+  benchName = 'a thousand of uncached update calls';
   console.time(benchName);
   for (var i = 0; i < 1000; i++) {
     out = output(viperHTML.wire());

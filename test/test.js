@@ -1,7 +1,18 @@
 var tressa = require('tressa');
 var viperHTML = require('../viperhtml.js');
 
+Object.prototype.interfere = true;
+
 tressa.title('viperHTML');
+
+tressa.assert(viperHTML.wire()`` === '', 'empty template');
+tressa.assert(
+  viperHTML.wire()`<code> ${'text'} </code>` === '<code> text </code>',
+  'code with text'
+);
+tressa.assert(viperHTML.wire()`<![CDATA[!]]>` === '<![CDATA[!]]>', 'CDATA');
+tressa.assert(viperHTML.wire()`<?php ?>` === '<?php ?>', '<?processing ?>');
+tressa.assert(viperHTML.wire()`<!-- comment -->` === '<!-- comment -->', '<!-- comment -->');
 
 tressa.async(done => {
   var output = render => render`
@@ -18,11 +29,10 @@ tressa.async(done => {
     onclick: (e) => e.preventDefault()
   };
   var link = viperHTML.bind(a);
-  tressa.assert(output(link) === `
-    <a href="https://github.com/WebReflection/viperHTML" onclick="return ((e) =&gt; e.preventDefault()).call(this, event)">
-      Click &quot;Me&quot;
-      <span><strong>"Risky" Me</strong></span><br></a>
-  `, 'expected layout');
+    tressa.assert(
+    output(link) === `<a href="https://github.com/WebReflection/viperHTML" onclick="return ((e) =&gt; e.preventDefault()).call(this, event)">Click &quot;Me&quot;<span><strong>"Risky" Me</strong></span><br></a>`,
+    'expected layout'
+  );
   tressa.assert(output(link) === output(link), 'cached template');
   done();
 });
@@ -32,14 +42,14 @@ tressa.async(done => {
   var html = viperHTML.bind({});
   var rendered = html`<button onclick="${onclick}" disabled="${true}">`;
   tressa.assert(
-    '<button onclick="return (function onclick() {}).call(this, event)" disabled>' === rendered,
+    '<button onclick="return (function onclick() {}).call(this, event)" disabled></button>' === rendered,
     'disabled="${true}" shows as disabled'
   );
 
   html = viperHTML.bind({});
   rendered = html`<button onclick="${onclick}" disabled="${false}">`;
   tressa.assert(
-    '<button onclick="return (function onclick() {}).call(this, event)">' === rendered,
+    '<button onclick="return (function onclick() {}).call(this, event)"></button>' === rendered,
     'disabled="${false}" does not show'
   );
   done();
@@ -69,9 +79,9 @@ tressa.async(done => {
 
 tressa.async(done => {
   var info = {click(){}};
-  var rendered = viperHTML.wire()`<button onclick="${info.click}">`;
+  var rendered = viperHTML.wire()`<button attr="value" onclick="${info.click}">`;
   tressa.assert(
-    `<button onclick="return (function click(){}).call(this, event)">` === rendered,
+    `<button attr="value" onclick="return (function click(){}).call(this, event)"></button>` === rendered,
     'shortcut methods are normalized'
   );
   done();
@@ -79,9 +89,9 @@ tressa.async(done => {
 
 
 tressa.async(done => {
-  var rendered = viperHTML.wire()`<p class="${undefined}">${null}<p> ${undefined}`;
+  var rendered = viperHTML.wire()`<p attr='"' class="${undefined}">${null}<p> ${undefined}`;
   tressa.assert(
-    `<p class="undefined"><p> undefined` === rendered,
+    `<p attr='"' class="undefined"><p>undefined</p></p>` === rendered,
     'null and undefined do not throw'
   );
   done();
@@ -89,27 +99,19 @@ tressa.async(done => {
 
 tressa.async(done => {
   tressa.assert(
-    viperHTML.wire()`>${'"HTML"'}` === '>"HTML"',
+    viperHTML.wire()`<br>${'"HTML"'}` === '<br>"HTML"',
     '> unescaped HTML'
   );
   tressa.assert(
-    viperHTML.wire()`${'"HTML"'}<` === '"HTML"<',
+    viperHTML.wire()`${'"HTML"'}<br>` === '"HTML"<br>',
     'unescaped HTML <'
   );
   tressa.assert(
-    viperHTML.wire()`<a onclick=${'"'}>` === '<a onclick=&quot;>',
+    viperHTML.wire()`<a onclick='${'"'}'>` === '<a onclick="&quot;"></a>',
     'not a function'
   );
   tressa.assert(
-    viperHTML.wire()`<a onclick="${'"'}>` === '<a onclick="&quot;>',
-    'not a "function'
-  );
-  tressa.assert(
-    viperHTML.wire()`<a onclick=${'"'}">` === '<a onclick=&quot;">',
-    'not a function"'
-  );
-  tressa.assert(
-    viperHTML.wire()`<a attr="${'"'}>` === '<a attr="&quot;>',
+    viperHTML.wire()`<a attr="${'"'}">` === '<a attr="&quot;"></a>',
     'not an attribute'
   );
   done();
@@ -132,12 +134,7 @@ tressa.async(done => {
   >Click Me</a>
   `;
   tressa.assert(
-    `
-  <a
-    href="viper.com"
-    onclick="return (e =&gt; e.preventDefault()).call(this, event)"
-  >Click Me</a>
-  ` === rendered,
+    `<a href="viper.com" onclick="return (e =&gt; e.preventDefault()).call(this, event)">Click Me</a>` === rendered,
     'arrow event'
   );
   done();
@@ -152,12 +149,7 @@ tressa.async(done => {
   >Click Me</a>
   `;
   tressa.assert(
-    `
-  <a
-    href="viper.com"
-    onclick=""
-  >Click Me</a>
-  ` === rendered,
+    `<a href="viper.com" onclick="">Click Me</a>` === rendered,
     'null event'
   );
   done();
@@ -183,12 +175,7 @@ tressa.async(done => {
   `).then(() => {
 
     tressa.assert(
-    `
-  <a
-    href="viper.com"
-    onclick=""
-  >Click Me</a>
-  ` === chunks.join(''),
+    `<a href="viper.com" onclick="">Click Me</a>` === chunks.join(''),
     'chunks resolved through promises'
   );
 

@@ -30,7 +30,7 @@
   "dependencies": {
     "html-escaper": "^1.0.1",
     "htmlparser2": "^3.9.2",
-    "hyperhtml": "^0.14.0"
+    "hyperhtml": "^0.15.1"
   },
   "devDependencies": {
     "coveralls": "^2.12.0",

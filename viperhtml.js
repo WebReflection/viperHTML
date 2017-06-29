@@ -107,14 +107,14 @@ function getUpdateForHTML() {
   return this instanceof Async ? identity : joinIfArray;
 }
 
-// multiple content joined as single string
-function joinIfArray(value) {
-  return isArray(value) ? value.join('') : value;
-}
-
 // pass along a generic value
 function identity(value) {
   return value;
+}
+
+// multiple content joined as single string
+function joinIfArray(value) {
+  return isArray(value) ? value.join('') : value;
 }
 
 // weakly relate a generic object to a genric value
@@ -201,10 +201,21 @@ function transform(template) {
       ) {
         updates[length] = escape;
       }
-      current.push(
-        isCDATA || /^pre|code$/i.test(tagName) ?
-          text : text.trim()
-      );
+      switch (true) {
+        case isCDATA:
+        case /^pre|code$/i.test(tagName):
+          current.push(text);
+          break;
+        case /^script$/i.test(tagName):
+          current.push(minifyJS(text));
+          break;
+        case /^style$/i.test(tagName):
+          current.push(minifyCSS(text));
+          break;
+        default:
+          current.push(text.trim());
+          break;
+      }
       isHTML = false;
     },
     oncomment: function (data) {
@@ -256,6 +267,21 @@ function updateEvent(value) {
         ('' + value)
     ) + ').call(this, event)') :
     escape(value || '');
+}
+
+// -------------------------
+// Minifiers
+// -------------------------
+
+function minifyCSS() {
+  return csso.minify.apply(csso, arguments).css;
+}
+
+function minifyJS(code, options) {
+  return uglify.minify(code, Object.assign({
+    // uglify-js defaults
+    output: {comments: /^!/}
+  }, options)).code;
 }
 
 // -------------------------
@@ -355,6 +381,8 @@ var
   JS_SHORTCUT = /^[a-z$_]\S*?\(/,
   JS_FUNCTION = /^function\S*?\(/,
   SPECIAL_ATTRIBUTE = /^(?:(?:on|allow)[a-z]+|async|autofocus|autoplay|capture|checked|controls|default|defer|disabled|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|nomodule|novalidate|open|playsinline|readonly|required|reversed|selected|truespeed|typemustmatch|usecache)$/,
+  csso = require('csso'),
+  uglify = require("uglify-js"),
   Parser = require('htmlparser2').Parser,
   htmlEscape = require('html-escaper').escape,
   templates = new Map(),
@@ -363,6 +391,11 @@ var
   wires = new WeakMap(),
   isArray = Array.isArray
 ;
+
+viperHTML.minify = {
+  css: minifyCSS,
+  js: minifyJS
+};
 
 module.exports = viperHTML;
 

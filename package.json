@@ -28,9 +28,11 @@
   },
   "homepage": "https://github.com/WebReflection/viperHTML#readme",
   "dependencies": {
+    "csso": "^3.1.1",
     "html-escaper": "^1.0.1",
     "htmlparser2": "^3.9.2",
-    "hyperhtml": "^0.15.1"
+    "hyperhtml": "^0.15.2",
+    "uglify-js": "^3.0.21"
   },
   "devDependencies": {
     "coveralls": "^2.12.0",

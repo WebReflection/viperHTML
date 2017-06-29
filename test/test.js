@@ -291,6 +291,27 @@ tressa.async(done => {
   done();
 }))
 .then(() => tressa.async(done => {
+  tressa.log('## viperHTML.minify');
+  tressa.assert(viperHTML.bind({})`
+    <style>
+    .test { color: #ff0000; }
+    </style>
+  ` === '<style>.test{color:red}</style>',
+  'static CSS minified once');
+  tressa.assert(viperHTML.bind({})`
+    <script>
+    /*! (c) */
+    // test.js
+    var globalVar;
+    function funcName(firstLongName, anotherLongName) {
+      var myVariable = firstLongName +  anotherLongName;
+    }
+    </script>
+  ` === '<script>/*! (c) */\nfunction funcName(a,n){}var globalVar;</script>',
+  'static JS minified once');
+  done();
+}))
+.then(() => tressa.async(done => {
 
   tressa.log('');
   tressa.log('## basic benchmark');

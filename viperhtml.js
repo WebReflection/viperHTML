@@ -142,8 +142,8 @@ function transform(template) {
         if (attributes.hasOwnProperty(key)) {
           var value = attributes[key];
           var isPermutation = value === UIDC;
-          var isSpecial = isPermutation && SPECIAL_ATTRIBUTE.test(key);
-          var isEvent = isSpecial && ATTRIBUTE_EVENT.test(key);
+          var isSpecial = SPECIAL_ATTRIBUTE.test(key);
+          var isEvent = isPermutation && ATTRIBUTE_EVENT.test(key);
           if (isPermutation) {
             if (isSpecial) {
               if (isEvent) {
@@ -159,8 +159,12 @@ function transform(template) {
             chunks.push(empty(current));
             if (!isSpecial || isEvent) current.push('"');
           } else {
-            var quote = value.indexOf('"') < 0 ? '"' : "'";
-            current.push(' ', key, '=', quote, value, quote);
+            if (isSpecial && value.length === 0) {
+              current.push(' ', key);
+            } else {
+              var quote = value.indexOf('"') < 0 ? '"' : "'";
+              current.push(' ', key, '=', quote, value, quote);
+            }
           }
         }
       }

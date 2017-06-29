@@ -52,6 +52,14 @@ tressa.async(done => {
     '<button onclick="return (function onclick() {}).call(this, event)"></button>' === rendered,
     'disabled="${false}" does not show'
   );
+
+  html = viperHTML.bind({});
+  rendered = html`<script defer src="${'viper.com'}"></script>`;
+  tressa.assert(
+    '<script defer src="viper.com"></script>' === rendered,
+    'special attributes are preserved'
+  );
+
   done();
 });
 

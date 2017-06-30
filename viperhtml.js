@@ -278,10 +278,11 @@ function minifyCSS() {
 }
 
 function minifyJS(code, options) {
-  return uglify.minify(code, Object.assign({
+  var result = uglify.minify(code, Object.assign({
     // uglify-js defaults
     output: {comments: /^!/}
-  }, options)).code;
+  }, options));
+  return result.error ? code : result.code;
 }
 
 // -------------------------

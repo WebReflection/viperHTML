@@ -378,7 +378,7 @@ var
   VOID_ELEMENT = /^area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr$/i,
   UID = '_viperHTML:' + require('crypto').randomBytes(16).toString('hex') + ';',
   UIDC = '<!--' + UID + '-->',
-  ATTRIBUTE_EVENT = /^on[a-z]+$/,
+  ATTRIBUTE_EVENT = /^on\S+$/,
   JS_SHORTCUT = /^[a-z$_]\S*?\(/,
   JS_FUNCTION = /^function\S*?\(/,
   SPECIAL_ATTRIBUTE = /^(?:(?:on|allow)[a-z]+|async|autofocus|autoplay|capture|checked|controls|default|defer|disabled|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|nomodule|novalidate|open|playsinline|readonly|required|reversed|selected|truespeed|typemustmatch|usecache)$/,

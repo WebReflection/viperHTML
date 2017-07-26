@@ -290,6 +290,10 @@ tressa.async(done => {
 
   done();
 }))
+.then(function () {
+  tressa.log('## hyperHTML.escape(html)');
+  tressa.assert(viperHTML.escape('<html>') === '&lt;html&gt;', 'escape as expected');
+})
 .then(() => tressa.async(done => {
   tressa.log('## viperHTML.minify');
   tressa.assert(viperHTML.bind({})`

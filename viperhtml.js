@@ -49,6 +49,9 @@ viperHTML.async = function getAsync(obj) {
     (asyncs.get(obj) || set(asyncs, obj, createAsync()));
 };
 
+// reflection hyperHTML.escape API
+viperHTML.escape = escape;
+
 // - - - - - - - - - - - - - - - - - -  - - - - -
 
 // -------------------------

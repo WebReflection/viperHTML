@@ -393,8 +393,12 @@ var
   asyncs = new WeakMap(),
   vipers = new WeakMap(),
   wires = new WeakMap(),
-  isArray = Array.isArray
+  isArray = Array.isArray,
+  bind = viperHTML.bind
 ;
+
+// traps function bind once (useful in destructuring)
+viperHTML.bind = function () { return bind.apply(viperHTML, arguments); };
 
 viperHTML.minify = {
   css: minifyCSS,

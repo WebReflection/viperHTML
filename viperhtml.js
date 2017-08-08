@@ -216,7 +216,7 @@ function transform(template) {
           current.push(minifyCSS(text));
           break;
         default:
-          current.push(text.trim());
+          current.push(text);
           break;
       }
       isHTML = false;

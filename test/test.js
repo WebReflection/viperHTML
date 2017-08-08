@@ -30,7 +30,7 @@ tressa.async(done => {
   };
   var link = viperHTML.bind(a);
     tressa.assert(
-    output(link) === `<a href="https://github.com/WebReflection/viperHTML" onclick="return ((e) =&gt; e.preventDefault()).call(this, event)">Click &quot;Me&quot;<span><strong>"Risky" Me</strong></span><br></a>`,
+    output(link) === "\n    <a href=\"https://github.com/WebReflection/viperHTML\" onclick=\"return ((e) =&gt; e.preventDefault()).call(this, event)\">\n      Click &quot;Me&quot;\n      <span><strong>\"Risky\" Me</strong></span><br></a>\n  ",
     'expected layout'
   );
   tressa.assert(output(link) === output(link), 'cached template');
@@ -99,7 +99,7 @@ tressa.async(done => {
 tressa.async(done => {
   var rendered = viperHTML.wire()`<p attr='"' class="${undefined}">${null}<p> ${undefined}`;
   tressa.assert(
-    `<p attr='"' class="undefined"><p>undefined</p></p>` === rendered,
+    `<p attr='"' class="undefined"><p> undefined</p></p>` === rendered,
     'null and undefined do not throw'
   );
   done();
@@ -142,7 +142,7 @@ tressa.async(done => {
   >Click Me</a>
   `;
   tressa.assert(
-    `<a href="viper.com" onclick="return (e =&gt; e.preventDefault()).call(this, event)">Click Me</a>` === rendered,
+    `\n  <a href="viper.com" onclick="return (e =&gt; e.preventDefault()).call(this, event)">Click Me</a>\n  ` === rendered,
     'arrow event'
   );
   done();
@@ -157,7 +157,7 @@ tressa.async(done => {
   >Click Me</a>
   `;
   tressa.assert(
-    `<a href="viper.com" onclick="">Click Me</a>` === rendered,
+    `\n  <a href="viper.com" onclick="">Click Me</a>\n  ` === rendered,
     'null event'
   );
   done();
@@ -183,7 +183,7 @@ tressa.async(done => {
   `).then(() => {
 
     tressa.assert(
-    `<a href="viper.com" onclick="">Click Me</a>` === chunks.join(''),
+    `\n  <a href="viper.com" onclick="">Click Me</a>\n  ` === chunks.join(''),
     'chunks resolved through promises'
   );
 
@@ -291,8 +291,12 @@ tressa.async(done => {
   done();
 }))
 .then(function () {
-  tressa.log('## hyperHTML.escape(html)');
+  tressa.log('## viperHTML.escape(html)');
   tressa.assert(viperHTML.escape('<html>') === '&lt;html&gt;', 'escape as expected');
+})
+.then(function () {
+  tressa.log('## preserved text');
+  tressa.assert(viperHTML.wire()`<div> Hello, ${'World'} </div>` === '<div> Hello, World </div>', 'OK');
 })
 .then(() => tressa.async(done => {
   tressa.log('## viperHTML.minify');
@@ -300,7 +304,7 @@ tressa.async(done => {
     <style>
     .test { color: #ff0000; }
     </style>
-  ` === '<style>.test{color:red}</style>',
+  ` === '\n    <style>.test{color:red}</style>\n  ',
   'static CSS minified once');
   tressa.assert(viperHTML.bind({})`
     <script>
@@ -311,17 +315,17 @@ tressa.async(done => {
       var myVariable = firstLongName +  anotherLongName;
     }
     </script>
-  ` === '<script>/*! (c) */\nfunction funcName(a,n){}var globalVar;</script>',
+  ` === '\n    <script>/*! (c) */\nfunction funcName(a,n){}var globalVar;</script>\n  ',
   'static JS minified once');
   tressa.assert(viperHTML.bind({})`
     <script>
     // same
     var globalVar =
     </script>
-  ` === `<script>
+  ` === `\n    <script>
     // same
     var globalVar =
-    </script>`,
+    </script>\n  `,
     'script errors are left unchanged'
   );
   done();

@@ -34,8 +34,10 @@ var output = render => render`
   >
     <!-- also text is always safe -->
     ${a.text}
-    <!-- HTML goes in as it is -->
-    <span>${a.html}</span>
+    <!-- use Arrays to opt-in HTML -->
+    <span>
+      ${[a.html]}
+    </span>
   </a>
 `;
 
@@ -66,27 +68,6 @@ The resulting output will be the following one:
     <span><strong>"HTML" Me</strong></span>
   </a>
 ```
-
-
-### The 2 + 1 hyperHTML Rules to Remember
-
-  * attributes and callbacks must go in single or double quoted attributes, even booleans `<button disabled="${true}">`
-  * if there is any chars different from `>` and `<` surrounding the text, it's text content, never HTML
-
-As extra point on performance:
-
-  * bound or wired objects are on average 2~10X faster to update and return the new content
-
-Following a basic benchmark result to demonstrate one-off use case is also very fast anyway.
-
-```sh
-basic benchmark 
-first call: upgrade + update: 0.554ms
-second call: cached update: 0.137ms
-a thousand of cached update calls: 30.167ms
-a thousand of uncached upgrade + update calls: 39.001ms
-```
-
 
 ### Usage Example
 ```js

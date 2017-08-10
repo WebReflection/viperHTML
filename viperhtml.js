@@ -58,6 +58,16 @@ viperHTML.escape = escape;
 // Helpers
 // -------------------------
 
+// used to force html output
+function asHTML(html) {
+  return {html: html};
+}
+
+// parse all comments at once and sanitize them
+function comments($0, $1, $2, $3) {
+  return $1 + $2.replace(FIND_ATTRIBUTES, sanitizeAttributes) + $3;
+}
+
 // instrument a wire to work asynchronously
 // passing along an optional resolved chunks
 // interceptor callback
@@ -107,7 +117,7 @@ function fixUpdates(updates) {
 // if an interpolated value is an Array
 // return Promise or join by empty string
 function getUpdateForHTML() {
-  return this instanceof Async ? identity : joinIfArray;
+  return this instanceof Async ? identity : asTemplateValue;
 }
 
 // pass along a generic value
@@ -115,9 +125,50 @@ function identity(value) {
   return value;
 }
 
+// use a placeholder and resolve with the right callback
+function invokeAtDistance(value) {
+  if ('text' in value) {
+    return Promise.resolve(value.text).then(String).then(asTemplateValue);
+  } else if ('any' in value) {
+    return Promise.resolve(value.any).then(asTemplateValue);
+  } else if ('html' in value) {
+    return Promise.resolve(value.html).then(asHTML).then(asTemplateValue);
+  } else {
+    return Promise.resolve(invokeTransformer(value)).then(asTemplateValue);
+  }
+}
+
+// last attempt to transform content
+function invokeTransformer(object) {
+  for (var key in transformers) {
+    if (object.hasOwnProperty(key)) {
+      return transformers[key](object[key]);
+    }
+  }
+}
+
 // multiple content joined as single string
-function joinIfArray(value) {
-  return isArray(value) ? value.join('') : value;
+function asTemplateValue(value) {
+  switch(typeof value) {
+    case 'string':
+    case 'number':
+    case 'boolean': return escape(value);
+    case 'object':
+    case 'undefined':
+      if (value == null) return '';
+    default:
+      if (isArray(value)) return value.join('');
+      if ('placeholder' in value) return invokeAtDistance(value);
+      if ('text' in value) return escape(value.text);
+      if ('any' in value) return asTemplateValue(value.any);
+      if ('html' in value) return [].concat(value.html).join('');
+      return asTemplateValue(invokeTransformer(value));
+  }
+}
+
+// sanitizes quotes around attributes
+function sanitizeAttributes($0, $1, $2) {
+  return $1 + ($2 || '"') + UID + ($2 || '"');
 }
 
 // weakly relate a generic object to a genric value
@@ -132,7 +183,6 @@ function set(map, object, value) {
 // sanitize and clean the layout too
 function transform(template) {
   var tagName = '';
-  var isHTML = false;
   var isCDATA = false;
   var current = [];
   var chunks = [];
@@ -144,7 +194,7 @@ function transform(template) {
       for (var key in attributes) {
         if (attributes.hasOwnProperty(key)) {
           var value = attributes[key];
-          var isPermutation = value === UIDC;
+          var isPermutation = value === UID;
           var isSpecial = SPECIAL_ATTRIBUTE.test(key);
           var isEvent = isPermutation && ATTRIBUTE_EVENT.test(key);
           if (isPermutation) {
@@ -172,12 +222,10 @@ function transform(template) {
         }
       }
       current.push('>');
-      isHTML = true;
     },
     oncdatastart: function () {
       current.push('<![CDATA[');
       isCDATA = true;
-      isHTML  = false;
     },
     oncdataend: function () {
       current.push(']]>');
@@ -185,25 +233,15 @@ function transform(template) {
     },
     onprocessinginstruction: function (name, data) {
       current.push('<', data, '>');
-      isHTML  = false;
     },
     onclosetag: function (name) {
       if (!VOID_ELEMENT.test(name)) {
         current.push('</', name, '>');
       }
       tagName = '';
-      isHTML = true;
     },
     ontext: function (text) {
       var length = updates.length - 1;
-      if (
-        !isCDATA &&
-        !isHTML &&
-        -1 < length &&
-        updates[length] === getUpdateForHTML
-      ) {
-        updates[length] = escape;
-      }
       switch (true) {
         case isCDATA:
         case /^pre|code$/i.test(tagName):
@@ -219,20 +257,14 @@ function transform(template) {
           current.push(text);
           break;
       }
-      isHTML = false;
     },
     oncomment: function (data) {
       if (data === UID) {
         chunks.push(empty(current));
-        updates.push(
-          isHTML || chunks[chunks.length - 1] === '' ?
-            getUpdateForHTML :
-            escape
-        );
+        updates.push(getUpdateForHTML);
       } else {
         current.push('<!--' + data + '-->');
       }
-      isHTML = false;
     },
     onend: function () {
       chunks.push(empty(current));
@@ -241,7 +273,7 @@ function transform(template) {
     decodeEntities: false,
     xmlMode: true
   });
-  content.write(template.join(UIDC));
+  content.write(template.join(UIDC).replace(NO, comments));
   content.end();
   return {
     chunks: chunks,
@@ -315,8 +347,8 @@ function chunks() {
       } else {
         all = chain(
           Promise.resolve(value)
-                 .then(joinIfArray)
-                 .then(update === joinIfArray ? identity : update)
+                 .then(asTemplateValue)
+                 .then(update === asTemplateValue ? identity : update)
         );
       }
     },
@@ -379,12 +411,14 @@ function wireWeakly(obj, id) {
 
 var
   VOID_ELEMENT = /^area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr$/i,
-  UID = '_viperHTML:' + require('crypto').randomBytes(16).toString('hex') + ';',
+  UID = '_viperHTML: ' + require('crypto').randomBytes(16).toString('hex') + ';',
   UIDC = '<!--' + UID + '-->',
   ATTRIBUTE_EVENT = /^on\S+$/,
   JS_SHORTCUT = /^[a-z$_]\S*?\(/,
   JS_FUNCTION = /^function\S*?\(/,
   SPECIAL_ATTRIBUTE = /^(?:(?:on|allow)[a-z]+|async|autofocus|autoplay|capture|checked|controls|default|defer|disabled|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|nomodule|novalidate|open|playsinline|readonly|required|reversed|selected|truespeed|typemustmatch|usecache)$/,
+  NO = new RegExp('(<[a-z]+[a-z0-9:_-]*)((?:[^\\S]+[a-z0-9:_-]+(?:=(?:\'.*?\'|".*?"|<.+?>|\\S+))?)+)([^\\S]*/?>)', 'g'),
+  FIND_ATTRIBUTES = new RegExp('([^\\S][a-z]+[a-z0-9:_-]*=)([\'"]?)' + UIDC + '\\2', 'g'),
   csso = require('csso'),
   uglify = require("uglify-js"),
   Parser = require('htmlparser2').Parser,
@@ -394,7 +428,8 @@ var
   vipers = new WeakMap(),
   wires = new WeakMap(),
   isArray = Array.isArray,
-  bind = viperHTML.bind
+  bind = viperHTML.bind,
+  transformers = {}
 ;
 
 // traps function bind once (useful in destructuring)
@@ -403,6 +438,10 @@ viperHTML.bind = function () { return bind.apply(viperHTML, arguments); };
 viperHTML.minify = {
   css: minifyCSS,
   js: minifyJS
+};
+
+viperHTML.define = function define(transformer, callback) {
+  transformers[transformer] = callback;
 };
 
 module.exports = viperHTML;

@@ -154,7 +154,7 @@ function asTemplateValue(value) {
     case 'number':
     case 'boolean': return escape(value);
     case 'object':
-      if (value instanceof String) return value;
+      if (value instanceof Buffer) return value;
     case 'undefined':
       if (value == null) return '';
     default:
@@ -381,7 +381,7 @@ function update() {
   ) {
     out.push(updates[i - 1](arguments[i]), template[i]);
   }
-  return new String(out.join(''));
+  return Buffer.from(out.join(''));
 }
 
 // but the first time, it needs to be setup.

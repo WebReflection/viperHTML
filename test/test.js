@@ -5,24 +5,24 @@ Object.prototype.interfere = true;
 
 tressa.title('viperHTML');
 
-tressa.assert(viperHTML.wire()`` === '', 'empty template');
+tressa.assert(viperHTML.wire()`` == '', 'empty template');
 tressa.assert(
-  viperHTML.wire()`<code> ${'text'} </code>` === '<code> text </code>',
+  viperHTML.wire()`<code> ${'text'} </code>` == '<code> text </code>',
   'code with text'
 );
-tressa.assert(viperHTML.wire()`<![CDATA[!]]>` === '<![CDATA[!]]>', 'CDATA');
-tressa.assert(viperHTML.wire()`<?php ?>` === '<?php ?>', '<?processing ?>');
-tressa.assert(viperHTML.wire()`<!-- comment -->` === '<!-- comment -->', '<!-- comment -->');
+tressa.assert(viperHTML.wire()`<![CDATA[!]]>` == '<![CDATA[!]]>', 'CDATA');
+tressa.assert(viperHTML.wire()`<?php ?>` == '<?php ?>', '<?processing ?>');
+tressa.assert(viperHTML.wire()`<!-- comment -->` == '<!-- comment -->', '<!-- comment -->');
 
 tressa.async(done => {
   tressa.log('## explicit intents');
   tressa.assert(
-    viperHTML.wire()`<p>${{text: '<b></b>'}}</p>` ===
+    viperHTML.wire()`<p>${{text: '<b></b>'}}</p>` ==
     '<p>&lt;b&gt;&lt;/b&gt;</p>',
     'explicit text content'
   );
   tressa.assert(
-    viperHTML.wire()`<p>${{any: ['<b></b>']}}</p>` ===
+    viperHTML.wire()`<p>${{any: ['<b></b>']}}</p>` ==
     '<p><b></b></p>',
     'explicit any content'
   );
@@ -55,10 +55,10 @@ tressa.async(done => {
   };
   var link = viperHTML.bind(a);
   tressa.assert(
-    output(link) === "\n    <a href=\"https://github.com/WebReflection/viperHTML\" onclick=\"return ((e) =&gt; e.preventDefault()).call(this, event)\">\n      Click &quot;Me&quot;\n      <span><strong>\"Risky\" Me</strong></span>\n      <br>\n      </a>\n  ",
+    output(link) == "\n    <a href=\"https://github.com/WebReflection/viperHTML\" onclick=\"return ((e) =&gt; e.preventDefault()).call(this, event)\">\n      Click &quot;Me&quot;\n      <span><strong>\"Risky\" Me</strong></span>\n      <br>\n      </a>\n  ",
     'expected layout'
   );
-  tressa.assert(output(link) === output(link), 'cached template');
+  tressa.assert(output(link) == output(link).toString(), 'cached template');
   done();
 });
 
@@ -67,21 +67,21 @@ tressa.async(done => {
   var html = viperHTML.bind({});
   var rendered = html`<button onclick="${onclick}" disabled="${true}">`;
   tressa.assert(
-    '<button onclick="return (function onclick() {}).call(this, event)" disabled></button>' === rendered,
+    '<button onclick="return (function onclick() {}).call(this, event)" disabled></button>' == rendered,
     'disabled="${true}" shows as disabled'
   );
 
   html = viperHTML.bind({});
   rendered = html`<button onclick="${onclick}" disabled="${false}">`;
   tressa.assert(
-    '<button onclick="return (function onclick() {}).call(this, event)"></button>' === rendered,
+    '<button onclick="return (function onclick() {}).call(this, event)"></button>' == rendered,
     'disabled="${false}" does not show'
   );
 
   html = viperHTML.bind({});
   rendered = html`<script defer src="${'viper.com'}"></script>`;
   tressa.assert(
-    '<script defer src="viper.com"></script>' === rendered,
+    '<script defer src="viper.com"></script>' == rendered,
     'special attributes are preserved'
   );
 
@@ -92,19 +92,19 @@ tressa.async(done => {
   var reference = {};
   var rendered = viperHTML.wire()`"hello wire"`;
   tressa.assert(
-    '"hello wire"' === rendered,
+    '"hello wire"' == rendered,
     'wire works as expected'
   );
   tressa.assert(
-    viperHTML.wire(reference) === viperHTML.wire(reference),
+    viperHTML.wire(reference) == viperHTML.wire(reference),
     'same reference, same wire'
   );
   tressa.assert(
-    viperHTML.wire() !== viperHTML.wire(),
+    viperHTML.wire() != viperHTML.wire(),
     'no reference, different wire'
   );
   tressa.assert(
-    viperHTML.wire({}) !== viperHTML.wire({}),
+    viperHTML.wire({}) != viperHTML.wire({}),
     'different reference, different wire'
   );
   done();
@@ -114,7 +114,7 @@ tressa.async(done => {
   var info = {click(){}};
   var rendered = viperHTML.wire()`<button attr="value" onclick="${info.click}">`;
   tressa.assert(
-    `<button attr="value" onclick="return (function click(){}).call(this, event)"></button>` === rendered,
+    `<button attr="value" onclick="return (function click(){}).call(this, event)"></button>` == rendered,
     'shortcut methods are normalized'
   );
   done();
@@ -124,7 +124,7 @@ tressa.async(done => {
 tressa.async(done => {
   var rendered = viperHTML.wire()`<p attr='"' class="${undefined}">${null}<p> ${undefined}`;
   tressa.assert(
-    `<p attr='\"' class=\"undefined\"><p> </p></p>` === rendered,
+    `<p attr='\"' class=\"undefined\"><p> </p></p>` == rendered,
     'null and undefined do not throw'
   );
   done();
@@ -132,19 +132,19 @@ tressa.async(done => {
 
 tressa.async(done => {
   tressa.assert(
-    viperHTML.wire()`<br>${['"HTML"']}` === '<br>"HTML"',
+    viperHTML.wire()`<br>${['"HTML"']}` == '<br>"HTML"',
     '> unescaped HTML'
   );
   tressa.assert(
-    viperHTML.wire()`${['"HTML"']}<br>` === '"HTML"<br>',
+    viperHTML.wire()`${['"HTML"']}<br>` == '"HTML"<br>',
     'unescaped HTML <'
   );
   tressa.assert(
-    viperHTML.wire()`<a onclick='${'"'}'>` === '<a onclick="&quot;"></a>',
+    viperHTML.wire()`<a onclick='${'"'}'>` == '<a onclick="&quot;"></a>',
     'not a function'
   );
   tressa.assert(
-    viperHTML.wire()`<a attr="${'"'}">` === '<a attr="&quot;"></a>',
+    viperHTML.wire()`<a attr="${'"'}">` == '<a attr="&quot;"></a>',
     'not an attribute'
   );
   done();
@@ -154,7 +154,7 @@ tressa.async(done => {
   var bound = viperHTML.bind({});
   debugger;
   tressa.assert(
-    bound`a${1}b` !== bound`${'a'}2b`,
+    bound`a${1}b` != String(bound`${'a'}2b`),
     'branching templates'
   );
   done();
@@ -168,7 +168,7 @@ tressa.async(done => {
   >Click Me</a>
   `;
   tressa.assert(
-    `\n  <a href="viper.com" onclick="return (e =&gt; e.preventDefault()).call(this, event)">Click Me</a>\n  ` === rendered,
+    `\n  <a href="viper.com" onclick="return (e =&gt; e.preventDefault()).call(this, event)">Click Me</a>\n  ` == rendered,
     'arrow event'
   );
   done();
@@ -183,7 +183,7 @@ tressa.async(done => {
   >Click Me</a>
   `;
   tressa.assert(
-    `\n  <a href="viper.com" onclick="">Click Me</a>\n  ` === rendered,
+    `\n  <a href="viper.com" onclick="">Click Me</a>\n  ` == rendered,
     'null event'
   );
   done();
@@ -209,7 +209,7 @@ tressa.async(done => {
   `).then(() => {
 
     tressa.assert(
-    `\n  <a href="viper.com" onclick="">Click Me</a>\n  ` === chunks.join(''),
+    `\n  <a href="viper.com" onclick="">Click Me</a>\n  ` == chunks.join(''),
     'chunks resolved through promises'
   );
 
@@ -234,29 +234,29 @@ tressa.async(done => {
     placeholder: 'whatever',
     text: '123'
   }}</p>`).then(result => {
-    tressa.assert(calls.join('') === '<p>123</p>', 'text sub chunks are correct');
-    tressa.assert(calls.join('') === result.join(''), 'text stream is correct');
+    tressa.assert(calls.join('') == '<p>123</p>', 'text sub chunks are correct');
+    tressa.assert(calls.join('') == result.join(''), 'text stream is correct');
     calls = [];
     (viperHTML.async()(calls.push.bind(calls))`<p>${{
       placeholder: 'whatever',
       any: '<b></b>'
     }}</p>`).then(result => {
-      tressa.assert(calls.join('') === '<p>&lt;b&gt;&lt;/b&gt;</p>', 'any sub chunks are correct');
-      tressa.assert(calls.join('') === result.join(''), 'any stream is correct');
+      tressa.assert(calls.join('') == '<p>&lt;b&gt;&lt;/b&gt;</p>', 'any sub chunks are correct');
+      tressa.assert(calls.join('') == result.join(''), 'any stream is correct');
       calls = [];
       (viperHTML.async()(calls.push.bind(calls))`<p>${{
         placeholder: 'whatever',
         html: '<b></b>'
       }}</p>`).then(result => {
-        tressa.assert(calls.join('') === '<p><b></b></p>', 'html sub chunks are correct');
-        tressa.assert(calls.join('') === result.join(''), 'html stream is correct');
+        tressa.assert(calls.join('') == '<p><b></b></p>', 'html sub chunks are correct');
+        tressa.assert(calls.join('') == result.join(''), 'html stream is correct');
         calls = [];
         (viperHTML.async()(calls.push.bind(calls))`<p>${{
           placeholder: 'whatever',
           nope: '<b></b>'
         }}</p>`).then(result => {
-          tressa.assert(calls.join('') === '<p></p>', 'other sub chunks are correct');
-          tressa.assert(calls.join('') === result.join(''), 'other stream is correct');
+          tressa.assert(calls.join('') == '<p></p>', 'other sub chunks are correct');
+          tressa.assert(calls.join('') == result.join(''), 'other stream is correct');
           calls = [];
           done();
         });
@@ -278,9 +278,9 @@ tressa.async(done => {
     subAsync(subRef.push.bind(subRef))`<span>${[2, Promise.resolve(3), 4]}</span>`,
     5
   ]}</p>`).then(result => {
-    tressa.assert(subRef.join('') === '<span>234</span>', 'sub chunks are correct');
-    tressa.assert(parentRef.join('') === result.join(''), 'chunks are like the result');
-    tressa.assert(result.join('') === '<p>1<span>234</span>5</p>', 'result is correct');
+    tressa.assert(subRef.join('') == '<span>234</span>', 'sub chunks are correct');
+    tressa.assert(parentRef.join('') == result.join(''), 'chunks are like the result');
+    tressa.assert(result.join('') == '<p>1<span>234</span>5</p>', 'result is correct');
     done();
   });
 
@@ -291,7 +291,7 @@ tressa.async(done => {
 
   var wire = viperHTML.wire();
   tressa.assert(
-    wire`<p>${[1,2,3]}</p>` === '<p>123</p>',
+    wire`<p>${[1,2,3]}</p>` == '<p>123</p>',
     'array as HTML'
   );
 
@@ -338,7 +338,7 @@ tressa.async(done => {
 .then(() => tressa.async(done => {
   tressa.log('## hyperHTML behaviors');
 
-  tressa.assert(viperHTML.bind({})`${['<br>']}` === '<br>', 'empty templates');
+  tressa.assert(viperHTML.bind({})`${['<br>']}` == '<br>', 'empty templates');
 
   var ref = {};
   tressa.assert(
@@ -361,11 +361,11 @@ tressa.async(done => {
 })
 .then(function () {
   tressa.log('## preserved text');
-  tressa.assert(viperHTML.wire()`<div> Hello, ${'World'} </div>` === '<div> Hello, World </div>', 'OK');
+  tressa.assert(viperHTML.wire()`<div> Hello, ${'World'} </div>` == '<div> Hello, World </div>', 'OK');
 })
 .then(function () {
   tressa.log('## attributes without quotes');
-  tressa.assert(viperHTML.wire()`<div test=${123}></div>` === '<div test="123"></div>', 'OK');
+  tressa.assert(viperHTML.wire()`<div test=${123}></div>` == '<div test="123"></div>', 'OK');
 })
 .then(() => tressa.async(done => {
   tressa.log('## viperHTML.minify');
@@ -373,7 +373,7 @@ tressa.async(done => {
     <style>
     .test { color: #ff0000; }
     </style>
-  ` === '\n    <style>.test{color:red}</style>\n  ',
+  ` == '\n    <style>.test{color:red}</style>\n  ',
   'static CSS minified once');
   tressa.assert(viperHTML.bind({})`
     <script>
@@ -384,14 +384,14 @@ tressa.async(done => {
       var myVariable = firstLongName +  anotherLongName;
     }
     </script>
-  ` === '\n    <script>/*! (c) */\nfunction funcName(a,n){}var globalVar;</script>\n  ',
+  ` == '\n    <script>/*! (c) */\nfunction funcName(a,n){}var globalVar;</script>\n  ',
   'static JS minified once');
   tressa.assert(viperHTML.bind({})`
     <script>
     // same
     var globalVar =
     </script>
-  ` === `\n    <script>
+  ` == `\n    <script>
     // same
     var globalVar =
     </script>\n  `,
@@ -399,6 +399,21 @@ tressa.async(done => {
   );
   done();
 }))
+.then(function () {
+  tressa.log('## HTML and Promises');
+  function document(render, model) {
+    return render`<body>${model.body}</body>`;
+  }
+  tressa.assert(
+    document(
+      viperHTML.wire(),
+      {
+        body: viperHTML.wire()`<p>Hello</p>`
+      }
+    ) == '<body><p>Hello</p></body>',
+    'wired content is always considered HTML'
+  );
+})
 .then(() => tressa.async(done => {
 
   tressa.log('');

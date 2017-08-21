@@ -31,11 +31,11 @@
     "csso": "^3.1.1",
     "html-escaper": "^1.0.1",
     "htmlparser2": "^3.9.2",
-    "hyperhtml": "^1.0.0",
-    "uglify-js": "^3.0.21"
+    "hyperhtml": "^1.2.0",
+    "uglify-js": "^3.0.28"
   },
   "devDependencies": {
-    "coveralls": "^2.12.0",
+    "coveralls": "^2.13.1",
     "istanbul": "^0.4.5",
     "tressa": "^0.3.1"
   }

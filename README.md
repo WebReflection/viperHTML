@@ -144,9 +144,14 @@ require('http')
 
       // basic model example with async content
       {
-        head: Promise.resolve('<title>right away</title>'),
+        head: Promise.resolve({html: '<title>right away</title>'}),
         body: new Promise(res => setTimeout(
-          res, 1000, '<div>later on</div>'
+          res, 1000,
+          // either:
+          //  {html: '<div>later on</div>'}
+          //  ['<div>later on</div>']
+          //  wire()'<div>later on</div>'
+          viperHTML.wire()`<div>later on</div>`
         ))
       }
     )

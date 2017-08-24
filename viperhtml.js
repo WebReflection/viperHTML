@@ -150,9 +150,9 @@ function invokeTransformer(object) {
 // multiple content joined as single string
 function asTemplateValue(value) {
   switch(typeof value) {
-    case 'string':
-    case 'number':
-    case 'boolean': return escape(value);
+    case 'string': return escape(value);
+    case 'boolean':
+    case 'number': return value;
     case 'object':
       if (value instanceof Buffer) return value;
     case 'undefined':

@@ -415,6 +415,20 @@ tressa.async(done => {
   );
 })
 .then(() => tressa.async(done => {
+  tressa.log('## asynchronous boolean attributes');
+  var asyncWire = viperHTML.async();
+  var out = [];
+  asyncWire(out.push.bind(out))
+  `<script async=${Promise.resolve(true)} defer=${Promise.resolve(false)}></script>`;
+  setTimeout(() => {
+    tressa.assert(
+      /<script\s+async\s*><\/script>/.test(out.join('')),
+      'boolean attributes are either in or out'
+    );
+    done();
+  }, 200);
+}))
+.then(() => tressa.async(done => {
 
   tressa.log('');
   tressa.log('## basic benchmark');

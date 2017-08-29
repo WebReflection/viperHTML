@@ -2,6 +2,22 @@
 
 /*! (C) 2017 Andrea Giammarchi @WebReflection (MIT) */
 
+// friendly destructuring
+viper.viper = viper;
+
+// magic entry point for most operations (bind, wire)
+function viper(HTML) {
+  return arguments.length < 2 ?
+    (HTML == null || typeof HTML === 'string' ?
+      render.bind({}) :
+      ('raw' in HTML ?
+        render.bind({})(HTML) :
+        wireWeakly(HTML, 'html'))) :
+    ('raw' in HTML ?
+      render.bind({}) : viper.wire
+    ).apply(null, arguments);
+}
+
 // viperHTML \o/
 //
 // var render = viperHTML.bind(object);
@@ -11,7 +27,7 @@
 //    ${(new Date).toLocaleString()}
 //  </p>
 // `;
-function viperHTML(template) {
+function render(template) {
   var viper = vipers.get(this);
     if (
       !viper ||
@@ -31,26 +47,23 @@ function viperHTML(template) {
 // render`
 //  <div>Hello Wired!</div>
 // `;
-viperHTML.wire = function wire(obj, type) {
-  return arguments.length < 1 ?
-      viperHTML.bind({}) :
-      (obj == null ?
-        viperHTML.bind({}) :
-        wireWeakly(obj, type || 'html')
-      );
+viper.wire = function wire(obj, type) {
+  return arguments.length < 1 || obj == null ?
+    render.bind({}) :
+    wireWeakly(obj, type || 'html');
 };
 
 // An asynchronous wire ➰ is a weakly referenced callback,
 // to be invoked right before the template literals
 // to return a rendered capable of resolving chunks.
-viperHTML.async = function getAsync(obj) {
+viper.async = function getAsync(obj) {
   return arguments.length < 1 ?
     createAsync() :
     (asyncs.get(obj) || set(asyncs, obj, createAsync()));
 };
 
 // reflection hyperHTML.escape API
-viperHTML.escape = escape;
+viper.escape = escape;
 
 // - - - - - - - - - - - - - - - - - -  - - - - -
 
@@ -74,7 +87,7 @@ function comments($0, $1, $2, $3) {
 function createAsync() {
   var
     wired = new Async,
-    wire = viperHTML.bind(wired),
+    wire = render.bind(wired),
     chunksReceiver
   ;
   wired.update = function () {
@@ -403,7 +416,7 @@ function upgrade(template) {
 
 function wireWeakly(obj, id) {
   var wire = wires.get(obj) || set(wires, obj, new Dict);
-  return wire[id] || (wire[id] = viperHTML.bind({}));
+  return wire[id] || (wire[id] = render.bind({}));
 }
 
 // -------------------------
@@ -429,23 +442,22 @@ var
   vipers = new WeakMap(),
   wires = new WeakMap(),
   isArray = Array.isArray,
-  bind = viperHTML.bind,
   transformers = {}
 ;
 
 // traps function bind once (useful in destructuring)
-viperHTML.bind = function () { return bind.apply(viperHTML, arguments); };
+viper.bind = function bind(context) { return render.bind(context); };
 
-viperHTML.minify = {
+viper.minify = {
   css: minifyCSS,
   js: minifyJS
 };
 
-viperHTML.define = function define(transformer, callback) {
+viper.define = function define(transformer, callback) {
   transformers[transformer] = callback;
 };
 
-module.exports = viperHTML;
+module.exports = viper;
 
 // local class to easily recognize async wires
 function Async() {}

@@ -152,7 +152,6 @@ tressa.async(done => {
 
 tressa.async(done => {
   var bound = viperHTML.bind({});
-  debugger;
   tressa.assert(
     bound`a${1}b` != String(bound`${'a'}2b`),
     'branching templates'
@@ -428,6 +427,18 @@ tressa.async(done => {
     done();
   }, 200);
 }))
+.then(function () {
+  tressa.log('## viper(...)');
+  var viper = viperHTML.viper;
+  tressa.assert(typeof viper() === 'function', 'empty viper() is a wire');
+  tressa.assert((viper`abc`) == 'abc', 'viper`abc`');
+  tressa.assert((viper`<p>a${2}c</p>`) == '<p>a2c</p>', 'viper`<p>a${2}c</p>`');
+  tressa.assert((viper({})`abc`) == 'abc', 'viper({})`abc`');
+  tressa.assert((viper({})`<p>a${'b'}c</p>`) == '<p>abc</p>', 'viper({})`<p>a${\'b\'}c</p>`');
+  tressa.assert((viper({}, ':id')`abc`) == 'abc', 'viper({}, \':id\')`abc`');
+  tressa.assert((viper({}, ':id')`<p>a${'b'}c</p>`) == '<p>abc</p>', 'viper({}, \':id\')`<p>a${\'b\'}c</p>`');
+  tressa.assert((viper('svg')`<rect />`), 'viper("svg")`<rect />`');
+})
 .then(() => tressa.async(done => {
 
   tressa.log('');

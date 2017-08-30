@@ -439,6 +439,50 @@ tressa.async(done => {
   tressa.assert((viper({}, ':id')`<p>a${'b'}c</p>`) == '<p>abc</p>', 'viper({}, \':id\')`<p>a${\'b\'}c</p>`');
   tressa.assert((viper('svg')`<rect />`), 'viper("svg")`<rect />`');
 })
+.then(function () { 'use strict';
+  tressa.log('## viper.Component');
+  var viper = viperHTML.viper;
+  class Button extends viper.Component {
+    render() { return this.html`
+      <button>hello</button>`;
+    }
+  }
+  class Rect extends viper.Component {
+    constructor(state) {
+      super().setState(state);
+    }
+    render() { return this.svg`
+      <rect x=${this.state.x} y=${this.state.y} />`;
+    }
+  }
+  class Paragraph extends viper.Component {
+    constructor(state) {
+      super().setState(state);
+    }
+    onclick() { this.clicked = true; }
+    render() { return this.html`
+      <p attr=${this.state.attr} onclick=${this}>hello</p>`;
+    }
+  }
+  var render = viper.bind({});
+  var result = render`${[
+    new Button,
+    new Rect({x: 123, y: 456})
+  ]}`;
+  tressa.assert(
+    /<button>hello<\/button>[\S\s]+<rect x="123" y="456"><\/rect>/.test(result),
+    'content is the expected one'
+  );
+  var p = new Paragraph(() => ({attr: 'test'}));
+  debugger;
+  result = render`${p}`;
+  tressa.assert(
+    /<p attr="test" onclick="">hello<\/p>/.test(result),
+    'single content is also OK'
+  );
+  // noop to invoke
+  p.handleEvent();
+})
 .then(() => tressa.async(done => {
 
   tressa.log('');

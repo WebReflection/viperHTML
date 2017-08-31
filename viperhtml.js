@@ -65,6 +65,30 @@ viper.async = function getAsync(obj) {
 // reflection hyperHTML.escape API
 viper.escape = escape;
 
+// viper.Component([initialState]) 🍻
+// An overly-simplified Component class.
+class Component {
+  get defaultState() { return {}; }
+  get html() {
+    return Object.defineProperty(
+      this, 'html', {value: render.bind(this)}
+    ).html;
+  }
+  get svg() { return this.html; }
+  handleEvent() { /* noop by default */ }
+  setState(state) {
+    var target = this.state || this.defaultState;
+    var source = typeof state === 'function' ? state.call(this, target) : state;
+    for (var key in source) target[key] = source[key];
+    this.state = target;
+    this.render();
+  }
+  // the render must be defined when extending hyper.Component
+  // the render **must** return either comp.html or comp.svg wire
+  // render() { return this.html`<p>that's it</p>`; }
+}
+viper.Component = Component;
+
 // - - - - - - - - - - - - - - - - - -  - - - - -
 
 // -------------------------
@@ -168,10 +192,18 @@ function asTemplateValue(value) {
     case 'number': return value;
     case 'object':
       if (value instanceof Buffer) return value;
+      if (value instanceof Component) return asTemplateValue(value.render());
     case 'undefined':
       if (value == null) return '';
     default:
-      if (isArray(value)) return value.join('');
+      if (isArray(value)) {
+        for (var i = 0, length = value.length; i < length; i++) {
+          if (value[i] instanceof Component) {
+            value[i] = value[i].render();
+          }
+        }
+        return value.join('');
+      }
       if ('placeholder' in value) return invokeAtDistance(value);
       if ('text' in value) return escape(value.text);
       if ('any' in value) return asTemplateValue(value.any);
@@ -308,14 +340,15 @@ function updateBoolean(name) {
 // stringifying the callback and invoking it
 // to simulate a proper DOM behavior
 function updateEvent(value) {
-  var isFunction = typeof value === 'function';
-  return isFunction ?
-    ('return (' + escape(
+  switch (typeof value) {
+    case 'function': return 'return (' + escape(
       JS_SHORTCUT.test(value) && !JS_FUNCTION.test(value) ?
         ('function ' + value) :
         ('' + value)
-    ) + ').call(this, event)') :
-    escape(value || '');
+    ) + ').call(this, event)';
+    case 'object': return '';
+    default: return escape(value || '');
+  }
 }
 
 // -------------------------

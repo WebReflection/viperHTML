@@ -68,19 +68,18 @@ viper.escape = escape;
 // viper.Component([initialState]) 🍻
 // An overly-simplified Component class.
 class Component {
-  get defaultState() { return {}; }
-  get html() {
-    return Object.defineProperty(
-      this, 'html', {value: render.bind(this)}
-    ).html;
-  }
-  get svg() { return this.html; }
   handleEvent() { /* noop by default */ }
+  get html() { return (this.html = render.bind(this)); }
+  set html(value) { defineValue(this, 'html', value); }
+  get svg() { return (this.svg = render.bind(this)); }
+  set svg(value) { defineValue(this, 'svg', value); }
+  get state() { return (this.state = this.defaultState); }
+  set state(value) { defineValue(this, 'state', value); }
+  get defaultState() { return {}; }
   setState(state) {
-    var target = this.state || this.defaultState;
+    var target = this.state;
     var source = typeof state === 'function' ? state.call(this, target) : state;
     for (var key in source) target[key] = source[key];
-    this.state = target;
     this.render();
   }
   // the render must be defined when extending hyper.Component
@@ -122,6 +121,11 @@ function createAsync() {
     chunksReceiver = callback || String;
     return wire;
   };
+}
+
+// set a configurable, non enumerable, non writable property
+function defineValue(self, key, value) {
+  Object.defineProperty(self, key, {configurable: true, value: value});
 }
 
 // splice 0 - length an array and join its content

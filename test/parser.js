@@ -5,7 +5,7 @@ const render = viper.bind({});
 console.log(render`<!DOCTYPE html>
 <html>
   <head>
-    <title> ${'"text"'} </title>
+    <title>${'"text"'}</title>
   </head>
-  <body>${'"html"'}</body>
+  <body>${['"html"']}</body>
 </html>`);

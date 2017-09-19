@@ -189,16 +189,17 @@ function invokeTransformer(object) {
 }
 
 // multiple content joined as single string
-function asTemplateValue(value) {
+function asTemplateValue(value, isAttribute) {
+  var suffix = isAttribute ? '' : HYPER_COMMENT;
   switch(typeof value) {
-    case 'string': return escape(value);
+    case 'string': return escape(value) + suffix;
     case 'boolean':
-    case 'number': return value;
+    case 'number': return value + suffix;
     case 'object':
-      if (value instanceof Buffer) return value;
-      if (value instanceof Component) return asTemplateValue(value.render());
+      if (value instanceof Buffer) return value + suffix;
+      if (value instanceof Component) return asTemplateValue(value.render(), isAttribute);
     case 'undefined':
-      if (value == null) return '';
+      if (value == null) return '' + suffix;
     default:
       if (isArray(value)) {
         for (var i = 0, length = value.length; i < length; i++) {
@@ -206,13 +207,13 @@ function asTemplateValue(value) {
             value[i] = value[i].render();
           }
         }
-        return value.join('');
+        return value.join('') + suffix;
       }
       if ('placeholder' in value) return invokeAtDistance(value);
-      if ('text' in value) return escape(value.text);
-      if ('any' in value) return asTemplateValue(value.any);
-      if ('html' in value) return [].concat(value.html).join('');
-      return asTemplateValue(invokeTransformer(value));
+      if ('text' in value) return escape(value.text) + suffix;
+      if ('any' in value) return asTemplateValue(value.any, isAttribute);
+      if ('html' in value) return [].concat(value.html).join('') + suffix;
+      return asTemplateValue(invokeTransformer(value), isAttribute);
   }
 }
 
@@ -257,7 +258,7 @@ function transform(template) {
               }
             } else {
               current.push(' ', key, '="');
-              updates.push(escape);
+              updates.push(updateAttribute);
             }
             chunks.push(empty(current));
             if (!isSpecial || isEvent) current.push('"');
@@ -331,13 +332,25 @@ function transform(template) {
   };
 }
 
+// same as escape but specific for attributes
+function updateAttribute(s) {
+  return htmlEscape(String(s));
+}
+
 // return the right callback to update a boolean attribute
 // after modifying the template to ignore such attribute if falsy
 function updateBoolean(name) {
   name = ' ' + name;
-  return function (value) {
-    return value ? name : '';
-  };
+  function update(value) {
+    switch (value) {
+      case true:
+      case 'true':
+        return name;
+    }
+    return '';
+  }
+  update[UID] = true;
+  return update;
 }
 
 // return the right callback to invoke an event
@@ -392,13 +405,24 @@ function chunks() {
                   return after;
                 });
     },
-    getValue = function (value) {
+    getSubValue = function (value) {
       if (isArray(value)) {
-        value.forEach(getValue);
+        value.forEach(getSubValue);
       } else {
         all = chain(
           Promise.resolve(value)
-                 .then(asTemplateValue)
+                 .then(resolveArray)
+        );
+      }
+    },
+    getValue = function (value) {
+      if (isArray(value)) {
+        value.forEach(getSubValue);
+        all = chain(Promise.resolve(HYPER_COMMENT));
+      } else {
+        all = chain(
+          Promise.resolve(value)
+                 .then(resolveAsTemplateValue(update))
                  .then(update === asTemplateValue ? identity : update)
         );
       }
@@ -415,6 +439,27 @@ function chunks() {
     all = chain(template[i]);
   }
   return all.then(notify).then(function () { return out; });
+}
+
+// tweaks asTemplateValue to think the value is an Array
+// but without needing to add the suffix.
+// Used to place an hyper comment after a group of values has been resolved
+// instead of per each resolved value.
+function resolveArray(value) {
+  return asTemplateValue(isArray(value) ? value : [value], true);
+}
+
+// invokes at distance asTemplateValue
+// passing the "isAttribute" flag
+function resolveAsTemplateValue(update) {
+  return function (value) {
+    return asTemplateValue(
+      value,
+      update === updateAttribute ||
+      update === updateEvent ||
+      UID in update
+    );
+  };
 }
 
 // each known viperHTML update is
@@ -461,6 +506,7 @@ function wireWeakly(obj, id) {
 // -------------------------
 
 var
+  HYPER_COMMENT = '<!--_hyper: 8;-->',
   VOID_ELEMENT = /^area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr$/i,
   UID = '_viperHTML: ' + require('crypto').randomBytes(16).toString('hex') + ';',
   UIDC = '<!--' + UID + '-->',

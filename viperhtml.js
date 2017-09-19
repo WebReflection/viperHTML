@@ -504,7 +504,7 @@ function wireWeakly(obj, id) {
 }
 
 function createHyperComment() {
-  return '<!--\x01:' + (++hyperComment).toString(36) + '-->';
+  return adoptable ? ('<!--\x01:' + (++hyperComment).toString(36) + '-->') : '';
 }
 
 // -------------------------
@@ -531,7 +531,8 @@ var
   wires = new WeakMap(),
   isArray = Array.isArray,
   transformers = {},
-  hyperComment = 0
+  hyperComment = 0,
+  adoptable = false
 ;
 
 // traps function bind once (useful in destructuring)
@@ -545,6 +546,15 @@ viper.minify = {
 viper.define = function define(transformer, callback) {
   transformers[transformer] = callback;
 };
+
+Object.defineProperty(viper, 'adoptable', {
+  get: function () {
+    return adoptable;
+  },
+  set: function (value) {
+    adoptable = !!value;
+  }
+});
 
 module.exports = viper;
 

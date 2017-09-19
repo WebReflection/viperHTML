@@ -5,6 +5,13 @@ Object.prototype.interfere = true;
 
 tressa.title('viperHTML');
 
+tressa.assert(viperHTML.adoptable === false, 'non adoptable by default');
+tressa.assert(
+  viperHTML.wire()`<code> ${'text'} </code>` == '<code> text </code>',
+  'code with unadoptable text'
+);
+viperHTML.adoptable = true;
+
 tressa.assert(viperHTML.wire()`` == '', 'empty template');
 tressa.assert(
   viperHTML.wire()`<code> ${'text'} </code>` == '<code> <!--\x01:1-->text<!--\x01:1--> </code>',

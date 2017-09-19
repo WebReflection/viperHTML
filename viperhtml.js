@@ -190,16 +190,16 @@ function invokeTransformer(object) {
 
 // multiple content joined as single string
 function asTemplateValue(value, isAttribute) {
-  var suffix = isAttribute ? '' : HYPER_COMMENT;
+  var presuf = isAttribute ? '' : createHyperComment();
   switch(typeof value) {
-    case 'string': return escape(value) + suffix;
+    case 'string': return presuf + escape(value) + presuf;
     case 'boolean':
-    case 'number': return value + suffix;
+    case 'number': return presuf + value + presuf;
     case 'object':
-      if (value instanceof Buffer) return value + suffix;
+      if (value instanceof Buffer) return presuf + value + presuf;
       if (value instanceof Component) return asTemplateValue(value.render(), isAttribute);
     case 'undefined':
-      if (value == null) return '' + suffix;
+      if (value == null) return presuf + '' + presuf;
     default:
       if (isArray(value)) {
         for (var i = 0, length = value.length; i < length; i++) {
@@ -207,12 +207,12 @@ function asTemplateValue(value, isAttribute) {
             value[i] = value[i].render();
           }
         }
-        return value.join('') + suffix;
+        return presuf + value.join('') + presuf;
       }
       if ('placeholder' in value) return invokeAtDistance(value);
-      if ('text' in value) return escape(value.text) + suffix;
+      if ('text' in value) return presuf + escape(value.text) + presuf;
       if ('any' in value) return asTemplateValue(value.any, isAttribute);
-      if ('html' in value) return [].concat(value.html).join('') + suffix;
+      if ('html' in value) return presuf + [].concat(value.html).join('') + presuf;
       return asTemplateValue(invokeTransformer(value), isAttribute);
   }
 }
@@ -417,8 +417,10 @@ function chunks() {
     },
     getValue = function (value) {
       if (isArray(value)) {
+        var hc = Promise.resolve(createHyperComment());
+        all = chain(hc);
         value.forEach(getSubValue);
-        all = chain(Promise.resolve(HYPER_COMMENT));
+        all = chain(hc);
       } else {
         all = chain(
           Promise.resolve(value)
@@ -501,12 +503,15 @@ function wireWeakly(obj, id) {
   return wire[id] || (wire[id] = render.bind({}));
 }
 
+function createHyperComment() {
+  return '<!--\x01:' + (++hyperComment).toString(36) + '-->';
+}
+
 // -------------------------
 // local variables
 // -------------------------
 
 var
-  HYPER_COMMENT = '<!--_hyper: 8;-->',
   VOID_ELEMENT = /^area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr$/i,
   UID = '_viperHTML: ' + require('crypto').randomBytes(16).toString('hex') + ';',
   UIDC = '<!--' + UID + '-->',
@@ -525,7 +530,8 @@ var
   vipers = new WeakMap(),
   wires = new WeakMap(),
   isArray = Array.isArray,
-  transformers = {}
+  transformers = {},
+  hyperComment = 0
 ;
 
 // traps function bind once (useful in destructuring)

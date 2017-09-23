@@ -547,9 +547,9 @@ viper.minify = {
 
 viper.define = function define(transformer, callback) {
   if (!(transformer in transformers)) {
-    transformers[transformer] = callback;
     transformersKeys.push(transformer);
   }
+  transformers[transformer] = callback;
   // TODO: else throw ? console.warn ? who cares ?
 };
 

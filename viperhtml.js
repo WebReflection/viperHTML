@@ -181,7 +181,8 @@ function invokeAtDistance(value) {
 
 // last attempt to transform content
 function invokeTransformer(object) {
-  for (var key in transformers) {
+  for (var key, i = 0, length = transformersKeys.length; i < length; i++) {
+    key = transformersKeys[i];
     if (object.hasOwnProperty(key)) {
       return transformers[key](object[key]);
     }
@@ -531,6 +532,7 @@ var
   wires = new WeakMap(),
   isArray = Array.isArray,
   transformers = {},
+  transformersKeys = [],
   hyperComment = 0,
   adoptable = false
 ;
@@ -544,7 +546,11 @@ viper.minify = {
 };
 
 viper.define = function define(transformer, callback) {
-  transformers[transformer] = callback;
+  if (!(transformer in transformers)) {
+    transformers[transformer] = callback;
+    transformersKeys.push(transformer);
+  }
+  // TODO: else throw ? console.warn ? who cares ?
 };
 
 Object.defineProperty(viper, 'adoptable', {

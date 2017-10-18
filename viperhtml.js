@@ -184,10 +184,15 @@ function invokeTransformer(object) {
   for (var key, i = 0, length = transformersKeys.length; i < length; i++) {
     key = transformersKeys[i];
     if (object.hasOwnProperty(key)) {
-      return transformers[key](object[key]);
+      // noop is passed to respect hyperHTML API but it won't have
+      // any effect at distance for the time being
+      return transformers[key](object[key], noop);
     }
   }
 }
+
+// literally
+function noop() {}
 
 // multiple content joined as single string
 function asTemplateValue(value, isAttribute) {

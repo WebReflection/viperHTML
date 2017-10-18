@@ -35,7 +35,7 @@
     "uglify-js": "^3.0.28"
   },
   "devDependencies": {
-    "coveralls": "^2.13.1",
+    "coveralls": "^3.0.0",
     "istanbul": "^0.4.5",
     "tressa": "^0.3.1"
   }

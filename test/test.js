@@ -38,7 +38,10 @@ tressa.async(done => {
 
 tressa.async(done => {
   tressa.log('## defined transformer');
-  viperHTML.define('eUC', encodeURIComponent);
+  viperHTML.define('eUC', function (value, noop) {
+    noop();
+    return encodeURIComponent(value);
+  });
   tressa.assert(/a=<!--\x01:6-->b%20c<!--\x01:6-->/.test(viperHTML.wire()`a=${{eUC: 'b c'}}`), 'expected virtual layout');
   tressa.assert(/<p><!--\x01:8-->b%20c<!--\x01:8--><\/p>/.test(viperHTML.wire()`<p>${{eUC: 'b c'}}</p>`), 'expected layout');
   tressa.assert(/<p><!--\x01:a--><!--\x01:a--><\/p>/.test(viperHTML.wire()`<p>${{asd: 'b c'}}</p>`), 'empty layout');

@@ -62,9 +62,6 @@ viper.async = function getAsync(obj) {
     (asyncs.get(obj) || set(asyncs, obj, createAsync()));
 };
 
-// reflection hyperHTML.escape API
-viper.escape = escape;
-
 // viper.Component([initialState]) 🍻
 // An overly-simplified Component class.
 class Component {
@@ -145,12 +142,11 @@ function fixUpdates(updates) {
     update,
     i = 0,
     length = updates.length,
-    out = new Array(length);
+    out = [];
     i < length; i++
   ) {
     update = updates[i];
-    out[i] = update === getUpdateForHTML ?
-              update.call(this) : update;
+    out.push(update === getUpdateForHTML ? update.call(this) : update);
   }
   return out;
 }
@@ -301,7 +297,7 @@ function transform(template) {
       var length = updates.length - 1;
       switch (true) {
         case isCDATA:
-        case /^pre|code$/i.test(tagName):
+        case /^code|input|textarea|pre$/i.test(tagName):
           current.push(text);
           break;
         case /^script$/i.test(tagName):
@@ -311,7 +307,7 @@ function transform(template) {
           current.push(minifyCSS(text));
           break;
         default:
-          current.push(text);
+          current.push(adoptable ? text : text.trim());
           break;
       }
     },
@@ -367,7 +363,7 @@ function updateEvent(value) {
     case 'function': return 'return (' + escape(
       JS_SHORTCUT.test(value) && !JS_FUNCTION.test(value) ?
         ('function ' + value) :
-        ('' + value)
+        value
     ) + ').call(this, event)';
     case 'object': return '';
     default: return escape(value || '');

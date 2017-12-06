@@ -367,10 +367,6 @@ tressa.async(done => {
   done();
 }))
 .then(function () {
-  tressa.log('## viperHTML.escape(html)');
-  tressa.assert(viperHTML.escape('<html>') === '&lt;html&gt;', 'escape as expected');
-})
-.then(function () {
   tressa.log('## preserved text');
   tressa.assert(viperHTML.wire()`<div> Hello, ${'World'} </div>` == '<div> Hello, <!--:z-->World<!--:z--> </div>', 'OK');
 })

@@ -1,5 +1,7 @@
 const viper = require('../viperhtml');
 
+viper.adoptable = true;
+
 const render = viper.bind({});
 
 console.log(render`<!DOCTYPE html>
@@ -7,5 +9,5 @@ console.log(render`<!DOCTYPE html>
   <head>
     <title>${'"text"'}</title>
   </head>
-  <body>${['"html"']}</body>
+  <body class="${'name'}">${['"html"']}</body>
 </html>`.toString());

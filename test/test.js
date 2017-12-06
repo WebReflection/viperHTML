@@ -7,7 +7,7 @@ tressa.title('viperHTML');
 
 tressa.assert(viperHTML.adoptable === false, 'non adoptable by default');
 tressa.assert(
-  viperHTML.wire()`<code> ${'text'} </code>` == '<code> text </code>',
+  viperHTML.wire()`<p> ok </p><code> ${'text'} </code>` == '<p>ok</p><code> text </code>',
   'code with unadoptable text'
 );
 viperHTML.adoptable = true;

@@ -391,7 +391,7 @@ tressa.async(done => {
       var myVariable = firstLongName +  anotherLongName;
     }
     </script>
-  ` == '\n    <script>/*! (c) */\nfunction funcName(a,n){}var globalVar;</script>\n  ',
+  ` == '\n    <script>/*! (c) */\nvar globalVar;function funcName(a,n){}</script>\n  ',
   'static JS minified once');
   tressa.assert(viperHTML.bind({})`
     <script>

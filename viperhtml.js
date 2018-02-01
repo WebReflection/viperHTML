@@ -307,7 +307,7 @@ function transform(template) {
           current.push(minifyCSS(text));
           break;
         default:
-          current.push(adoptable ? text : text.trim());
+          current.push(text);
           break;
       }
     },

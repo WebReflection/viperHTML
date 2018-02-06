@@ -482,7 +482,6 @@ tressa.async(done => {
     'content is the expected one'
   );
   var p = new Paragraph(() => ({attr: 'test'}));
-  debugger;
   result = render`${p}`;
   tressa.assert(
     /<p attr="test" onclick="">hello<\/p>/.test(result),
@@ -491,6 +490,16 @@ tressa.async(done => {
   // noop to invoke
   p.handleEvent();
 })
+/* both textarea and style have an issue with adopt
+.then(() => tressa.async(done => {
+  tressa.assert(
+    viperHTML.wire()`<textarea>${'a'}</textarea>` ==
+    '<textarea>a</textarea>',
+    'textarea is fine'
+  );
+  done();
+}))
+// */
 .then(() => tressa.async(done => {
 
   tressa.log('');

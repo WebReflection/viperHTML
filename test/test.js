@@ -547,6 +547,60 @@ tressa.async(done => {
   console.timeEnd(benchName);
 
   done();
-}));
+}))
 
-
+.then(() => tressa.async(done => {
+  tressa.log('## Declarative Components');
+  class MenuSimple extends viperHTML.Component {
+    render(props) {
+      return this.setState(props, false).html`
+        <div>A simple menu</div>
+        <ul>
+          ${props.items.map(
+            (item, i) => MenuItem.for(this, i).render(item)
+          )}
+        </ul>
+      `;
+    }
+  }
+  class MenuWeakMap extends viperHTML.Component {
+    render(props) {
+      return this.setState(props, false).html`
+        <div>A simple menu</div>
+        <ul>
+          ${props.items.map(
+            item => MenuItem.for(this, item).render(item)
+          )}
+        </ul>
+      `;
+    }
+  }
+  class MenuItem extends viperHTML.Component {
+    render(props) {
+      return this.setState(props, false).html`
+        <li>${props.name}</li>
+      `;
+    }
+  }
+  var a = {};
+  var b = {};
+  viperHTML.bind(a)`${MenuSimple.for(a).render({
+    items: [{name: 'item 1'}, {name: 'item 2'}, {name: 'item 3'}]
+  })}`;
+  tressa.assert(MenuSimple.for(a) === MenuSimple.for(a), 'same simple menu');
+  viperHTML.bind(b)`${MenuWeakMap.for(b).render({
+    items: [{name: 'item 1'}, {name: 'item 2'}, {name: 'item 3'}]
+  })}`;
+  tressa.assert(MenuWeakMap.for(a) === MenuWeakMap.for(a), 'same weakmap menu');
+  tressa.assert(MenuSimple.for(a) === MenuWeakMap.for(a), 'different from simple');
+  tressa.assert(a.outerHTML === b.outerHTML, 'same layout');
+  done();
+}))
+.then(() => {
+  tressa.log('## <self-closing />');
+  const div = viperHTML.wire()`<div><self-closing test=${1} /><input /><self-closing test="2" /></div>`;
+  tressa.assert(
+    div == '<div><self-closing test="1"></self-closing><input><self-closing test="2"></self-closing></div>',
+    'self closing works'
+  );
+});

@@ -62,27 +62,7 @@ viper.async = function getAsync(obj) {
     (asyncs.get(obj) || set(asyncs, obj, createAsync()));
 };
 
-// viper.Component([initialState]) 🍻
-// An overly-simplified Component class.
-class Component {
-  handleEvent() { /* noop by default */ }
-  get html() { return (this.html = render.bind(this)); }
-  set html(value) { defineValue(this, 'html', value); }
-  get svg() { return (this.svg = render.bind(this)); }
-  set svg(value) { defineValue(this, 'svg', value); }
-  get state() { return (this.state = this.defaultState); }
-  set state(value) { defineValue(this, 'state', value); }
-  get defaultState() { return {}; }
-  setState(state) {
-    var target = this.state;
-    var source = typeof state === 'function' ? state.call(this, target) : state;
-    for (var key in source) target[key] = source[key];
-    this.render();
-  }
-  // the render must be defined when extending hyper.Component
-  // the render **must** return either comp.html or comp.svg wire
-  // render() { return this.html`<p>that's it</p>`; }
-}
+const Component = require('./Component.js')(render);
 viper.Component = Component;
 
 // - - - - - - - - - - - - - - - - - -  - - - - -
@@ -118,11 +98,6 @@ function createAsync() {
     chunksReceiver = callback || String;
     return wire;
   };
-}
-
-// set a configurable, non enumerable, non writable property
-function defineValue(self, key, value) {
-  Object.defineProperty(self, key, {configurable: true, value: value});
 }
 
 // splice 0 - length an array and join its content
@@ -224,7 +199,7 @@ function sanitizeAttributes($0, $1, $2) {
   return $1 + ($2 || '"') + UID + ($2 || '"');
 }
 
-// weakly relate a generic object to a genric value
+// weakly relate a generic object to a generic value
 function set(map, object, value) {
   map.set(object, value);
   return value;

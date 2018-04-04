@@ -475,7 +475,7 @@ tressa.async(done => {
   var render = viper.bind({});
   var result = render`${[
     new Button,
-    new Rect({x: 123, y: 456})
+    Rect.for({x: 123, y: 456})
   ]}`;
   tressa.assert(
     /<button>hello<\/button>[\S\s]+<rect x="123" y="456"><\/rect>/.test(result),

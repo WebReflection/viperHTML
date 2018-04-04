@@ -3,7 +3,7 @@
 module.exports = render => class Component {
   static for(context, id) {
     const info = children.get(context) || set(context);
-    return get(this, info, id == null ? 'default' : id);
+    return get(this, info, context, id == null ? 'default' : id);
   }
   handleEvent() { /* noop by default */ }
   get html() { return (this.html = render.bind(this)); }
@@ -32,15 +32,15 @@ const createEntry = (wm, id, component) => {
   wm.set(id, component);
   return component;
 };
-const get = (Class, info, id) => {
+const get = (Class, info, context, id) => {
   switch (typeof id) {
     case 'object':
     case 'function':
       const wm = info.w || (info.w = new WeakMap);
-      return wm.get(id) || createEntry(wm, id, new Class);
+      return wm.get(id) || createEntry(wm, id, new Class(context));
     default:
       const sm = info.p || (info.p = create(null));
-      return sm[id] || (sm[id] = new Class);
+      return sm[id] || (sm[id] = new Class(context));
   }
 };
 const set = context => {

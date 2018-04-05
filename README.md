@@ -6,7 +6,7 @@
 
 <img alt="viperHTML logo" src="https://webreflection.github.io/hyperHTML/logo/viperhtml.svg" width="116" height="81">
 
-[hyperHTML](https://github.com/WebReflection/hyperHTML) lightness, ease, and performance, for both client and server.
+[hyperHTML](https://github.com/WebReflection/hyperHTML) lightness, ease, and performance, for the server.
 
 - - -
 Don't miss the [viperHTML](https://github.com/WebReflection/viperHTML) version of **Hacker News**
@@ -17,12 +17,21 @@ Repo: https://github.com/WebReflection/viper-news
 - - -
 
 ### Same API without DOM constrains
-On browsers, `viperHTML` is simply a reference to [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e#.bgosolrh0),
-which uses template strings to parse just in time, and only once, a template DOM tree, achieving best possible performance updating only what's needed and never the rest.
-
-On server, and _document-less_ environments, `viperHTML` parses the template string once, decides what is an attribute, what is a callback, what is text and what is HTML, and any future call to the same render will only update parts of that string.
+Similar to its browser side counterpart, `viperHTML` parses the template string once, decides what is an attribute, what is a callback, what is text and what is HTML, and any future call to the same render will only update parts of that string.
 
 The result is a blazing fast template engine that makes templates and renders shareable between the client and the server.
+
+### Seamlessly Isomorphic
+No matter if you use ESM or CommonJS, you can use [hypermorphic](https://github.com/WebReflection/hypermorphic#hypermorphic-)
+to load same features on both client and server.
+
+```js
+// ESM example (assuming bundlers/ESM loaders in place)
+import {bind, wire} from 'hypermorphic';
+
+// CommonJS example
+const {bind, wire} = require('hypermorphic');
+```
 
 
 ### Automatically Sanitized HTML

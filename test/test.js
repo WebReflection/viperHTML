@@ -1,5 +1,5 @@
 var tressa = require('tressa');
-var viperHTML = require('../viperhtml.js');
+var viperHTML = require('../');
 
 Object.prototype.interfere = true;
 

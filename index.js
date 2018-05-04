@@ -235,7 +235,7 @@ function transform(template) {
               }
             } else {
               current.push(' ', key, '="');
-              updates.push(updateAttribute);
+              updates.push(/style/i.test(key) ? updateStyle : updateAttribute);
             }
             chunks.push(empty(current));
             if (!isSpecial || isEvent) current.push('"');
@@ -328,6 +328,37 @@ function updateBoolean(name) {
   }
   update[UID] = true;
   return update;
+}
+
+function ized($0, $1, $2) {
+  return $1 + '-' + $2.toLowerCase();
+}
+
+function asCSSValue(key, value) {
+  return typeof value === 'number' &&
+          !IS_NON_DIMENSIONAL.test(key) ? (value + 'px') : value;
+}
+
+function updateStyle(value) {
+  if (typeof value === 'object') {
+    for (var
+      key,
+      css = [],
+      keys = Object.keys(value),
+      i = 0, length = keys.length; i < length; i++
+    ) {
+      key = keys[i];
+      css.push(
+        key.replace(hyphen, ized),
+        ':',
+        asCSSValue(key, value[key]),
+        ';'
+      );
+    }
+    return htmlEscape(css.join(''));
+  } else {
+    return htmlEscape(value);
+  }
 }
 
 // return the right callback to invoke an event
@@ -498,6 +529,8 @@ var
   SPECIAL_ATTRIBUTE = /^(?:(?:on|allow)[a-z]+|async|autofocus|autoplay|capture|checked|controls|default|defer|disabled|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|nomodule|novalidate|open|playsinline|readonly|required|reversed|selected|truespeed|typemustmatch|usecache)$/,
   NO = /(<[a-z]+[a-z0-9:_-]*)((?:[^\S]+[a-z0-9:_-]+(?:=(?:'.*?'|".*?"|<.+?>|\S+))?)+)([^\S]*\/?>)/gi,
   FIND_ATTRIBUTES = new RegExp('([^\\S][a-z]+[a-z0-9:_-]*=)([\'"]?)' + UIDC + '\\2', 'gi'),
+  IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|ows|mnc|ntw|ine[ch]|zoo|^ord/i,
+  hyphen = /([^A-Z])([A-Z]+)/g,
   csso = require('csso'),
   uglify = require("uglify-js"),
   Parser = require('htmlparser2').Parser,

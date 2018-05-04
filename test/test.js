@@ -21,6 +21,17 @@ tressa.assert(viperHTML.wire()`<![CDATA[!]]>` == '<![CDATA[!]]>', 'CDATA');
 tressa.assert(viperHTML.wire()`<?php ?>` == '<?php ?>', '<?processing ?>');
 tressa.assert(viperHTML.wire()`<!-- comment -->` == '<!-- comment -->', '<!-- comment -->');
 
+tressa.assert(
+  viperHTML.wire()`<p style="${{marginLeft:1, padding:'auto'}}" />` ==
+  '<p style="margin-left:1px;padding:auto;"></p>',
+  'style as object'
+);
+tressa.assert(
+  viperHTML.wire()`<p style="${'margin-left:1px;padding:auto;'}" />` ==
+  '<p style="margin-left:1px;padding:auto;"></p>',
+  'style as text'
+);
+
 tressa.async(done => {
   tressa.log('## explicit intents');
   tressa.assert(

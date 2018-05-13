@@ -37,6 +37,8 @@ const {bind, wire} = require('hypermorphic');
 ### Automatically Sanitized HTML
 Both attributes and text nodes are safely escaped on each call.
 ```js
+const viperHTML = require('viperhtml');
+
 var output = render => render`
   <!-- attributes and callbacks are safe -->
   <a
@@ -63,7 +65,7 @@ var a = {
 // or simply use viperHTML.wire();
 var link = viperHTML.bind(a);
 
-console.log(output(link));
+console.log(output(link).toString());
 ```
 
 The resulting output will be the following one:
@@ -99,7 +101,7 @@ setTimeout(
   clearInterval,
   6000,
   setInterval(
-    render => console.log(tick(render)),
+    render => console.log(tick(render).toString()),
     1000,
     // On a browser, you'll need to bind
     // the content to a generic DOM node.

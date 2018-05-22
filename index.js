@@ -29,15 +29,15 @@ function viper(HTML) {
 // `;
 function render(template) {
   var viper = vipers.get(this);
-    if (
-      !viper ||
-      viper.template !== template
-    ) {
-      viper = upgrade.apply(this, arguments);
-      vipers.set(this, viper);
-    }
-    return (this instanceof Async ? this.update : update)
-            .apply(viper, arguments);
+  if (
+    !viper ||
+    viper.template !== template
+  ) {
+    viper = upgrade.apply(this, arguments);
+    vipers.set(this, viper);
+  }
+  return (this instanceof Async ? this.update : update)
+          .apply(viper, arguments);
 }
 
 // A wire ➰ is a shortcut to relate a specific object,
@@ -70,6 +70,11 @@ viper.Component = Component;
 // -------------------------
 // Helpers
 // -------------------------
+
+// used to produce a buffer output
+function asBuffer(output) {
+  return Buffer.from(output.join(''));
+}
 
 // used to force html output
 function asHTML(html) {
@@ -477,16 +482,24 @@ function resolveAsTemplateValue(update) {
 // the context will be a viper
 function update() {
   for (var
+    tmp,
+    promise = false,
     updates = this.updates,
     template = this.chunks,
+    out = [template[0]],
     i = 1,
-    length = arguments.length,
-    out = [template[0]];
+    length = arguments.length;
     i < length; i++
   ) {
-    out.push(updates[i - 1](arguments[i]), template[i]);
+    tmp = arguments[i];
+    if (tmp && typeof tmp.then === 'function') {
+      promise = true;
+      out.push(tmp.then(updates[i - 1]), template[i]);
+    } else {
+      out.push(updates[i - 1](tmp), template[i]);
+    }
   }
-  return Buffer.from(out.join(''));
+  return promise ? Promise.all(out).then(asBuffer) : asBuffer(out);
 }
 
 // but the first time, it needs to be setup.

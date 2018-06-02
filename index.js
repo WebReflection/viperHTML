@@ -31,7 +31,7 @@ function render(template) {
   var viper = vipers.get(this);
   if (
     !viper ||
-    viper.template !== template
+    viper.template !== TL(template)
   ) {
     viper = upgrade.apply(this, arguments);
     vipers.set(this, viper);
@@ -506,6 +506,7 @@ function update() {
 // From now on, only update(tempalte) will be called
 // unless this context won't be used for other renderings.
 function upgrade(template) {
+  template = TL(template);
   var info = templates.get(template) ||
       set(templates, template, transform(template));
   return {
@@ -556,7 +557,12 @@ var
   transformers = {},
   transformersKeys = [],
   hyperComment = 0,
-  adoptable = false
+  adoptable = false,
+  T = {},
+  TL = function (t) {
+    var k = '_' + t.join('_');
+    return T[k] || (T[k] = t);
+  }
 ;
 
 // traps function bind once (useful in destructuring)

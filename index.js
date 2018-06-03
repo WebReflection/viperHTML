@@ -31,7 +31,7 @@ function render(template) {
   var viper = vipers.get(this);
   if (
     !viper ||
-    viper.template !== TL(template)
+    viper.template !== template
   ) {
     viper = upgrade.apply(this, arguments);
     vipers.set(this, viper);
@@ -506,7 +506,6 @@ function update() {
 // From now on, only update(tempalte) will be called
 // unless this context won't be used for other renderings.
 function upgrade(template) {
-  template = TL(template);
   var info = templates.get(template) ||
       set(templates, template, transform(template));
   return {
@@ -549,7 +548,7 @@ var
   uglify = require("uglify-js"),
   Parser = require('htmlparser2').Parser,
   htmlEscape = require('html-escaper').escape,
-  templates = new Map(),
+  templates = new WeakMap(),
   asyncs = new WeakMap(),
   vipers = new WeakMap(),
   wires = new WeakMap(),
@@ -557,12 +556,7 @@ var
   transformers = {},
   transformersKeys = [],
   hyperComment = 0,
-  adoptable = false,
-  T = {},
-  TL = function (t) {
-    var k = '_' + t.join('_');
-    return T[k] || (T[k] = t);
-  }
+  adoptable = false
 ;
 
 // traps function bind once (useful in destructuring)

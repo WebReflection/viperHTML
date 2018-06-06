@@ -622,6 +622,24 @@ tressa.async(done => {
     done();
   });
 }))
+.then(() => 
+tressa.async(done => {
+  tressa.log('## Async with {placeholder}');
+  var calls = [];
+  (viperHTML.async()(calls.push.bind(calls))`<p>${
+    'a'
+  }${
+    viperHTML.wire()`b${{
+      placeholder: '...whatever ...',
+      any: new Promise((res) => setTimeout(res, 100, 'c'))
+    }}d`
+  }${
+    'e'
+  }</p>`).then(result => {
+    tressa.assert(calls.join('').replace(/<!--.+?-->/g, '') === '<p>abcde</p>', 'it works');
+    done();
+  });
+}))
 .then(() => {
   tressa.log('## <self-closing />');
   const div = viperHTML.wire()`<div><self-closing test=${1} /><input /><self-closing test="2" /></div>`;

@@ -143,15 +143,16 @@ function identity(value) {
 }
 
 // use a placeholder and resolve with the right callback
-function invokeAtDistance(value) {
+function invokeAtDistance(value, asTPV) {
+  var after = asTPV ? asTemplateValue : identity;
   if ('text' in value) {
-    return Promise.resolve(value.text).then(String).then(asTemplateValue);
+    return Promise.resolve(value.text).then(String).then(after);
   } else if ('any' in value) {
-    return Promise.resolve(value.any).then(asTemplateValue);
+    return Promise.resolve(value.any).then(after);
   } else if ('html' in value) {
-    return Promise.resolve(value.html).then(asHTML).then(asTemplateValue);
+    return Promise.resolve(value.html).then(asHTML).then(after);
   } else {
-    return Promise.resolve(invokeTransformer(value)).then(asTemplateValue);
+    return Promise.resolve(invokeTransformer(value)).then(after);
   }
 }
 
@@ -191,7 +192,7 @@ function asTemplateValue(value, isAttribute) {
         }
         return presuf + value.join('') + presuf;
       }
-      if ('placeholder' in value) return invokeAtDistance(value);
+      if ('placeholder' in value) return invokeAtDistance(value, true);
       if ('text' in value) return presuf + escape(value.text) + presuf;
       if ('any' in value) return asTemplateValue(value.any, isAttribute);
       if ('html' in value) return presuf + [].concat(value.html).join('') + presuf;
@@ -492,9 +493,17 @@ function update() {
     i < length; i++
   ) {
     tmp = arguments[i];
-    if (tmp && typeof tmp.then === 'function') {
+    if (
+      (typeof tmp === 'object' && tmp !== null)
+      &&
+      (typeof tmp.then === 'function' || 'placeholder' in tmp)
+    ) {
       promise = true;
-      out.push(tmp.then(updates[i - 1]), template[i]);
+      out.push(
+        ('placeholder' in tmp ? invokeAtDistance(tmp, false) : tmp)
+          .then(updates[i - 1]),
+        template[i]
+      );
     } else {
       out.push(updates[i - 1](tmp), template[i]);
     }

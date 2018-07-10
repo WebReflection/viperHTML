@@ -542,7 +542,7 @@ function createHyperComment() {
 // -------------------------
 
 var
-  VOID_ELEMENT = /^area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr$/i,
+  VOID_ELEMENT = /^(?:area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)$/i,
   UID = '_viperHTML: ' + require('crypto').randomBytes(16).toString('hex') + ';',
   UIDC = '<!--' + UID + '-->',
   ATTRIBUTE_EVENT = /^on\S+$/,

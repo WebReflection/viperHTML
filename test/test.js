@@ -493,6 +493,7 @@ tressa.async(done => {
     'content is the expected one'
   );
   var p = new Paragraph(() => ({attr: 'test'}));
+  tressa.assert(p.dispatch() === true, 'dispatch works');
   result = render`${p}`;
   tressa.assert(
     /<p attr="test" onclick="">hello<\/p>/.test(result),

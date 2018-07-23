@@ -13,6 +13,7 @@ module.exports = render => class Component {
   get state() { return (this.state = this.defaultState); }
   set state(value) { defineValue(this, 'state', value); }
   get defaultState() { return {}; }
+  dispatch() { return true; }
   setState(state, render) {
     var target = this.state;
     var source = typeof state === 'function' ? state.call(this, target) : state;

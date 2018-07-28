@@ -241,7 +241,13 @@ function transform(template) {
               }
             } else {
               current.push(' ', key, '="');
-              updates.push(/style/i.test(key) ? updateStyle : updateAttribute);
+              updates.push(
+                /style/i.test(key) ?
+                  updateStyle :
+                  (key in intentAttributes ?
+                    updateAttributeIntent(key) :
+                    updateAttribute)
+              );
             }
             chunks.push(empty(current));
             if (!isSpecial || isEvent) current.push('"');
@@ -318,6 +324,13 @@ function transform(template) {
 // same as escape but specific for attributes
 function updateAttribute(s) {
   return htmlEscape(String(s));
+}
+
+function updateAttributeIntent(name) {
+  return function (any) {
+    var result = intentAttributes[name](null, any);
+    return result == null ? '' : htmlEscape(String(result));
+  };
 }
 
 // return the right callback to update a boolean attribute
@@ -562,6 +575,7 @@ var
   vipers = new WeakMap(),
   wires = new WeakMap(),
   isArray = Array.isArray,
+  intentAttributes = {},
   transformers = {},
   transformersKeys = [],
   hyperComment = 0,
@@ -577,11 +591,15 @@ viper.minify = {
 };
 
 viper.define = function define(transformer, callback) {
-  if (!(transformer in transformers)) {
-    transformersKeys.push(transformer);
+  if (transformer.indexOf('-') < 0) {
+    if (!(transformer in transformers)) {
+      transformersKeys.push(transformer);
+    }
+    transformers[transformer] = callback;
+    // TODO: else throw ? console.warn ? who cares ?
+  } else {
+    intentAttributes[transformer] = callback;
   }
-  transformers[transformer] = callback;
-  // TODO: else throw ? console.warn ? who cares ?
 };
 
 Object.defineProperty(viper, 'adoptable', {

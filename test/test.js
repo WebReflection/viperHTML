@@ -648,4 +648,31 @@ tressa.async(done => {
     div == '<div><self-closing test="1"></self-closing><input><self-closing test="2"></self-closing></div>',
     'self closing works'
   );
+})
+.then(() => {
+  tressa.log('## define(hyper-attribute, callback)');
+  var random = Math.random();
+  var result = [];
+  viperHTML.define('hyper-attribute', function (target, value) {
+    result.push(target, value);
+    return random;
+  });
+  var p = viperHTML.wire()`<p hyper-attribute=${random}/>`;
+  tressa.assert(result[0] === null, 'null target, no DOM');
+  tressa.assert(result[1] === random, 'expected value');
+  tressa.assert(
+    /<p hyper-attribute="0\.\d+"><\/p>/.test(p.toString()),
+    'expected attribute'
+  );
+  result.splice(0);
+  viperHTML.define('other-attribute', function (target, value) {
+    result.push(target, value);
+  });
+  p = viperHTML.wire()`<p other-attribute=${random}/>`;
+  tressa.assert(result[0] === null, 'null other target, no DOM');
+  tressa.assert(result[1] === random, 'expected other value');
+  tressa.assert(
+    /<p other-attribute=""><\/p>/.test(p.toString()),
+    'expected attribute'
+  );
 });

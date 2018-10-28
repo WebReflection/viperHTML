@@ -197,7 +197,6 @@ tressa.async(done => {
   done();
 });
 
-
 tressa.async(done => {
   var rendered = viperHTML.wire()`
   <a
@@ -648,6 +647,11 @@ tressa.async(done => {
     div == '<div><self-closing test="1"></self-closing><input><self-closing test="2"></self-closing></div>',
     'self closing works'
   );
+})
+.then(() => {
+  tressa.log('## slotted callback');
+  var rendered = viperHTML.wire()`<p>${ref => 'whatever'}</p>`;
+  tressa.assert(rendered.toString().replace(/<!--.+?-->/g, '') === '<p>whatever</p>', 'slot works');
 })
 .then(() => {
   tressa.log('## define(hyper-attribute, callback)');

@@ -178,6 +178,7 @@ function asTemplateValue(value, isAttribute) {
     case 'string': return presuf + escape(value) + presuf;
     case 'boolean':
     case 'number': return presuf + value + presuf;
+    case 'function': return asTemplateValue(value({}), isAttribute);
     case 'object':
       if (value instanceof Buffer) return presuf + value + presuf;
       if (value instanceof Component) return asTemplateValue(value.render(), isAttribute);

@@ -329,8 +329,17 @@ function updateAttribute(s) {
 
 function updateAttributeIntent(name) {
   return function (any) {
-    var result = intentAttributes[name](null, any);
-    return result == null ? '' : htmlEscape(String(result));
+    var result = [];
+    var node = Object.create(null);
+    var attribute = intentAttributes[name](node, any);
+    result.push(attribute == null ? '' : htmlEscape(String(attribute)));
+    for (var key in node) {
+      var value = node[key];
+      result.push('" ')
+      result.push(key + '="')
+      result.push(value == null ? '' : htmlEscape(String(value)))
+    }
+    return result.join('');
   };
 }
 

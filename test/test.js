@@ -662,7 +662,7 @@ tressa.async(done => {
     return random;
   });
   var p = viperHTML.wire()`<p hyper-attribute=${random}/>`;
-  tressa.assert(result[0] === null, 'null target, no DOM');
+  tressa.assert(Object.keys(result[0]).length === 0, 'empty target object');
   tressa.assert(result[1] === random, 'expected value');
   tressa.assert(
     /<p hyper-attribute="0\.\d+"><\/p>/.test(p.toString()),
@@ -673,10 +673,25 @@ tressa.async(done => {
     result.push(target, value);
   });
   p = viperHTML.wire()`<p other-attribute=${random}/>`;
-  tressa.assert(result[0] === null, 'null other target, no DOM');
+  tressa.assert(Object.keys(result[0]).length === 0, 'empty target object');
   tressa.assert(result[1] === random, 'expected other value');
   tressa.assert(
     /<p other-attribute=""><\/p>/.test(p.toString()),
     'expected attribute'
+  );
+  result.splice(0);
+  viperHTML.define('attribute-adding-attribute', function (target, value) {
+    result.push(target, value);
+    target['added-attribute1'] = value;
+    target['added-attribute2'] = null;
+  });
+  p = viperHTML.wire()`<p attribute-adding-attribute=${random}/>`;
+  tressa.assert(Object.keys(result[0]).length === 2, 'expected added attributes');
+  tressa.assert(result[0]['added-attribute1'] === random, 'expected added attribute 1');
+  tressa.assert(result[0]['added-attribute2'] === null, 'expected added attribute 2');
+  tressa.assert(result[1] === random, 'expected other value');
+  tressa.assert(
+    /<p attribute-adding-attribute="" added-attribute1="0\.\d+" added-attribute2=""><\/p>/.test(p.toString()),
+    'expected attributes added to template'
   );
 });

@@ -30,7 +30,7 @@
   "dependencies": {
     "csso": "^3.5.0",
     "html-escaper": "^1.0.1",
-    "htmlparser2": "^3.9.2",
+    "htmlparser2": "^4.0.0",
     "uglify-js": "^3.3.27"
   },
   "devDependencies": {

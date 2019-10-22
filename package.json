@@ -1,6 +1,6 @@
 {
   "name": "viperhtml",
-  "version": "2.17.0",
+  "version": "2.17.1",
   "description": "Universal hyperHTML",
   "main": "index.js",
   "scripts": {

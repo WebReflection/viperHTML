@@ -31,7 +31,7 @@
     "csso": "^4.0.0",
     "html-escaper": "^2.0.0",
     "htmlparser2": "^4.0.0",
-    "uglify-js": "^3.6.3"
+    "uglify-js": "^3.6.9"
   },
   "devDependencies": {
     "coveralls": "^3.0.7",

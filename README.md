@@ -4,6 +4,18 @@
 
 [![donate](https://img.shields.io/badge/$-donate-ff69b4.svg?maxAge=2592000&style=flat)](https://github.com/WebReflection/donate) [![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](https://opensource.org/licenses/ISC) [![Build Status](https://travis-ci.org/WebReflection/hyperHTML.svg?branch=master)](https://travis-ci.org/WebReflection/viperHTML) [![Coverage Status](https://coveralls.io/repos/github/WebReflection/viperHTML/badge.svg?branch=master)](https://coveralls.io/github/WebReflection/viperHTML?branch=master) ![Blazing Fast](https://img.shields.io/badge/speed-blazing%20🔥-brightgreen.svg) [![Greenkeeper badge](https://badges.greenkeeper.io/WebReflection/viperHTML.svg)](https://greenkeeper.io/)
 
+## Warning
+
+Due [low popularity](https://www.npmjs.com/package/viperhtml) of this project after all these years, and because I have shifted focus to better alternatives, this **project is currently in maintenance mode**, meaning that 100% _feature parity_ with _hyperHTML_ is not anymore an achievement, and only the simple/obvious will be fixed.
+
+Among various changes happened to _hyperHTML_, the **sparse attributes** will likely **not** be **supported**, as the refactoring needed here would easily outperform the benefits.
+
+As _sparse attributes_ are never really been a must have, you can simply use `attr=${...}` and concatenate in there anything you want.
+
+This is also true for most modern alternatives of mine, such as [ucontent](https://github.com/WebReflection/ucontent#readme), but if that's the only deal breaker, have a look at [heresy-ssr](https://github.com/WebReflection/heresy-ssr#readme), which is 1:1 based on [lighterhtml](https://github.com/WebReflection/lighterhtml#readme), hence likely always 100% in features parity with it, included sparse attributes.
+
+- - -
+
 [hyperHTML](https://github.com/WebReflection/hyperHTML) lightness, ease, and performance, for the server.
 
 - - -
@@ -14,7 +26,7 @@ Live: https://viperhtml-164315.appspot.com/
 Repo: https://github.com/WebReflection/viper-news
 - - -
 
-### Same API without DOM constrains
+### Similar API without DOM constrains
 Similar to its browser side counterpart, `viperHTML` parses the template string once, decides what is an attribute, what is a callback, what is text and what is HTML, and any future call to the same render will only update parts of that string.
 
 The result is a blazing fast template engine that makes templates and renders shareable between the client and the server.
